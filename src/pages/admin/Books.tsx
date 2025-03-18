@@ -5,8 +5,6 @@ import {
   Search,
   Edit,
   Trash2,
-  Filter,
-  Download,
   AlertCircle
 } from 'lucide-react';
 
@@ -19,6 +17,17 @@ interface Book {
   status: 'available' | 'unavailable' | 'preorder';
   category: string;
   format: 'physical' | 'digital';
+}
+
+interface CustomModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  onConfirm?: () => void;
+  confirmText?: string;
+  cancelText?: string;
+  children?: React.ReactNode;
 }
 
 const initialBooks: Book[] = [
@@ -94,32 +103,175 @@ const initialBooks: Book[] = [
   }
 ];
 
-const AdminBooks = () => {
-  const [books, setBooks] = useState<Book[]>(initialBooks);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedFormat, setSelectedFormat] = useState("");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
+const CustomModal: React.FC<CustomModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  title, 
+  message, 
+  onConfirm, 
+  confirmText, 
+  cancelText, 
+  children 
+}) => {
+  if (!isOpen) return null;
 
-  // Filter books based on search term, category, and format
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center gap-3 text-red-600 mb-4">
+          <AlertCircle className="h-6 w-6" />
+          <h3 className="text-lg font-semibold">{title}</h3>
+        </div>
+        <div className="text-gray-600 mb-6">
+          {message}
+          {children}
+        </div>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            {cancelText || 'بستن'}
+          </button>
+          {onConfirm && (
+            <button
+              onClick={onConfirm}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              {confirmText || 'تایید'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AdminBooks: React.FC = () => {
+  const [books, setBooks] = useState<Book[]>(initialBooks);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedFormat, setSelectedFormat] = useState<string>("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
+  const [bookToEdit, setBookToEdit] = useState<Book | null>(null);
+  const [messageModal, setMessageModal] = useState<{ isOpen: boolean; title: string; message: string }>({
+    isOpen: false,
+    title: '',
+    message: ''
+  });
+  const [editForm, setEditForm] = useState<Partial<Book>>({});
+  const [newBookForm, setNewBookForm] = useState<Partial<Book>>({
+    title: '',
+    author: '',
+    price: '',
+    stock: 0,
+    status: 'available',
+    category: 'رمان',
+    format: 'physical'
+  });
+
+  const showMessage = (title: string, message: string) => {
+    setMessageModal({ isOpen: true, title, message });
+  };
+
   const filteredBooks = books.filter(book => {
-    const matchesSearch = book.title.includes(searchTerm) || 
-                         book.author.includes(searchTerm);
+    const matchesSearch = 
+      book.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      book.author.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || book.category === selectedCategory;
     const matchesFormat = !selectedFormat || book.format === selectedFormat;
-    
     return matchesSearch && matchesCategory && matchesFormat;
   });
 
   const handleAddBook = () => {
-    // TODO: Implement add book functionality
-    alert("این قابلیت به زودی اضافه خواهد شد");
+    setNewBookForm({
+      title: '',
+      author: '',
+      price: '',
+      stock: 0,
+      status: 'available',
+      category: 'رمان',
+      format: 'physical'
+    });
+    setShowAddModal(true);
+  };
+
+  const confirmAddBook = () => {
+    if (!newBookForm.title || !newBookForm.author || !newBookForm.price || newBookForm.stock === undefined) {
+      showMessage('خطا', 'لطفاً همه فیلدها را پر کنید');
+      return;
+    }
+
+    const priceNum = parseInt(newBookForm.price.replace(/[^0-9]/g, ''));
+    if (isNaN(priceNum)) {
+      showMessage('خطا', 'قیمت باید فقط شامل اعداد باشد');
+      return;
+    }
+
+    const newBook: Book = {
+      id: Math.max(...books.map(b => b.id)) + 1, // Generate new ID
+      title: newBookForm.title,
+      author: newBookForm.author,
+      price: `${priceNum.toLocaleString('fa-IR')} تومان`,
+      stock: newBookForm.stock,
+      status: newBookForm.status || 'available',
+      category: newBookForm.category || 'رمان',
+      format: newBookForm.format || 'physical'
+    };
+
+    setBooks([...books, newBook]);
+    setShowAddModal(false);
+    setNewBookForm({
+      title: '',
+      author: '',
+      price: '',
+      stock: 0,
+      status: 'available',
+      category: 'رمان',
+      format: 'physical'
+    });
+    showMessage('موفقیت', 'کتاب جدید با موفقیت اضافه شد');
   };
 
   const handleEditBook = (book: Book) => {
-    // TODO: Implement edit book functionality
-    alert(`ویرایش کتاب: ${book.title}`);
+    setBookToEdit(book);
+    setEditForm({
+      title: book.title,
+      author: book.author,
+      price: book.price,
+      stock: book.stock,
+      status: book.status,
+      category: book.category,
+      format: book.format
+    });
+    setShowEditModal(true);
+  };
+
+  const confirmEdit = () => {
+    if (!bookToEdit || !editForm.title || !editForm.author || !editForm.price || editForm.stock === undefined) {
+      showMessage('خطا', 'لطفاً همه فیلدها را پر کنید');
+      return;
+    }
+
+    const priceNum = parseInt(editForm.price.replace(/[^0-9]/g, ''));
+    if (isNaN(priceNum)) {
+      showMessage('خطا', 'قیمت باید فقط شامل اعداد باشد');
+      return;
+    }
+
+    setBooks(books.map(b => 
+      b.id === bookToEdit.id ? { 
+        ...b, 
+        ...editForm, 
+        price: `${priceNum.toLocaleString('fa-IR')} تومان` 
+      } as Book : b
+    ));
+    setShowEditModal(false);
+    setBookToEdit(null);
+    showMessage('موفقیت', 'کتاب با موفقیت ویرایش شد');
   };
 
   const handleDeleteBook = (book: Book) => {
@@ -128,11 +280,12 @@ const AdminBooks = () => {
   };
 
   const confirmDelete = () => {
-    if (bookToDelete) {
-      setBooks(books.filter(b => b.id !== bookToDelete.id));
-      setShowDeleteModal(false);
-      setBookToDelete(null);
-    }
+    if (!bookToDelete) return;
+
+    setBooks(books.filter(b => b.id !== bookToDelete.id));
+    setShowDeleteModal(false);
+    setBookToDelete(null);
+    showMessage('موفقیت', 'کتاب با موفقیت حذف شد');
   };
 
   const getStatusBadgeClass = (status: Book['status']) => {
@@ -172,7 +325,7 @@ const AdminBooks = () => {
           <h1 className="text-2xl font-bold">مدیریت کتاب‌ها</h1>
           <button 
             onClick={handleAddBook}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           >
             <Plus className="h-5 w-5" />
             افزودن کتاب جدید
@@ -261,34 +414,166 @@ const AdminBooks = () => {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-3 text-red-600 mb-4">
-              <AlertCircle className="h-6 w-6" />
-              <h3 className="text-lg font-semibold">تایید حذف کتاب</h3>
-            </div>
-            <p className="text-gray-600 mb-6">
-              آیا از حذف کتاب "{bookToDelete?.title}" اطمینان دارید؟ این عمل غیرقابل بازگشت است.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                انصراف
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                حذف
-              </button>
-            </div>
-          </div>
+      {/* Add Book Modal */}
+      <CustomModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="افزودن کتاب جدید"
+        message="اطلاعات کتاب جدید را وارد کنید:"
+        onConfirm={confirmAddBook}
+        confirmText="ثبت"
+        cancelText="انصراف"
+      >
+        <div className="space-y-4 mt-2">
+          <input
+            type="text"
+            value={newBookForm.title || ''}
+            onChange={(e) => setNewBookForm({ ...newBookForm, title: e.target.value })}
+            placeholder="عنوان"
+            className="w-full p-2 border rounded-lg"
+          />
+          <input
+            type="text"
+            value={newBookForm.author || ''}
+            onChange={(e) => setNewBookForm({ ...newBookForm, author: e.target.value })}
+            placeholder="نویسنده"
+            className="w-full p-2 border rounded-lg"
+          />
+          <input
+            type="text"
+            value={newBookForm.price || ''}
+            onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9]/g, ''); // Only allow numbers
+              setNewBookForm({ ...newBookForm, price: value });
+            }}
+            placeholder="قیمت (فقط عدد)"
+            className="w-full p-2 border rounded-lg"
+          />
+          <input
+            type="number"
+            value={newBookForm.stock || 0}
+            onChange={(e) => setNewBookForm({ ...newBookForm, stock: parseInt(e.target.value) || 0 })}
+            min="0"
+            placeholder="موجودی"
+            className="w-full p-2 border rounded-lg"
+          />
+          <select
+            value={newBookForm.status || 'available'}
+            onChange={(e) => setNewBookForm({ ...newBookForm, status: e.target.value as Book['status'] })}
+            className="w-full p-2 border rounded-lg"
+          >
+            <option value="available">موجود</option>
+            <option value="unavailable">ناموجود</option>
+            <option value="preorder">پیش‌فروش</option>
+          </select>
+          <select
+            value={newBookForm.category || 'رمان'}
+            onChange={(e) => setNewBookForm({ ...newBookForm, category: e.target.value })}
+            className="w-full p-2 border rounded-lg"
+          >
+            <option value="رمان">رمان</option>
+            <option value="علمی">علمی</option>
+          </select>
+          <select
+            value={newBookForm.format || 'physical'}
+            onChange={(e) => setNewBookForm({ ...newBookForm, format: e.target.value as Book['format'] })}
+            className="w-full p-2 border rounded-lg"
+          >
+            <option value="physical">چاپی</option>
+            <option value="digital">الکترونیک</option>
+          </select>
         </div>
-      )}
+      </CustomModal>
+
+      {/* Delete Modal */}
+      <CustomModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="تایید حذف کتاب"
+        message={`آیا از حذف کتاب "${bookToDelete?.title}" اطمینان دارید؟ این عمل غیرقابل بازگشت است.`}
+        onConfirm={confirmDelete}
+        confirmText="حذف"
+        cancelText="انصراف"
+      />
+
+      {/* Edit Modal */}
+      <CustomModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="ویرایش کتاب"
+        message="اطلاعات جدید کتاب را وارد کنید:"
+        onConfirm={confirmEdit}
+        confirmText="ثبت"
+        cancelText="انصراف"
+      >
+        <div className="space-y-4 mt-2">
+          <input
+            type="text"
+            value={editForm.title || ''}
+            onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+            placeholder="عنوان"
+            className="w-full p-2 border rounded-lg"
+          />
+          <input
+            type="text"
+            value={editForm.author || ''}
+            onChange={(e) => setEditForm({ ...editForm, author: e.target.value })}
+            placeholder="نویسنده"
+            className="w-full p-2 border rounded-lg"
+          />
+          <input
+            type="text"
+            value={editForm.price || ''}
+            onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9]/g, ''); // Only allow numbers
+              setEditForm({ ...editForm, price: value });
+            }}
+            placeholder="قیمت (فقط عدد)"
+            className="w-full p-2 border rounded-lg"
+          />
+          <input
+            type="number"
+            value={editForm.stock || 0}
+            onChange={(e) => setEditForm({ ...editForm, stock: parseInt(e.target.value) || 0 })}
+            min="0"
+            placeholder="موجودی"
+            className="w-full p-2 border rounded-lg"
+          />
+          <select
+            value={editForm.status || ''}
+            onChange={(e) => setEditForm({ ...editForm, status: e.target.value as Book['status'] })}
+            className="w-full p-2 border rounded-lg"
+          >
+            <option value="available">موجود</option>
+            <option value="unavailable">ناموجود</option>
+            <option value="preorder">پیش‌فروش</option>
+          </select>
+          <select
+            value={editForm.category || ''}
+            onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+            className="w-full p-2 border rounded-lg"
+          >
+            <option value="رمان">رمان</option>
+            <option value="علمی">علمی</option>
+          </select>
+          <select
+            value={editForm.format || ''}
+            onChange={(e) => setEditForm({ ...editForm, format: e.target.value as Book['format'] })}
+            className="w-full p-2 border rounded-lg"
+          >
+            <option value="physical">چاپی</option>
+            <option value="digital">الکترونیک</option>
+          </select>
+        </div>
+      </CustomModal>
+
+      {/* Message Modal */}
+      <CustomModal
+        isOpen={messageModal.isOpen}
+        onClose={() => setMessageModal({ isOpen: false, title: '', message: '' })}
+        title={messageModal.title}
+        message={messageModal.message}
+      />
     </>
   );
 };

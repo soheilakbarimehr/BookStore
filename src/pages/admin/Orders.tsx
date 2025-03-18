@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { 
   Search,
-  Filter,
   Eye,
   Download,
+  Plus,
   AlertCircle,
   Calendar
 } from 'lucide-react';
@@ -28,6 +28,17 @@ interface DayObject {
   year: number;
   month: number;
   day: number;
+}
+
+interface CustomModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  onConfirm?: () => void;
+  confirmText?: string;
+  cancelText?: string;
+  children?: React.ReactNode;
 }
 
 const initialOrders: Order[] = [
@@ -87,23 +98,88 @@ const initialOrders: Order[] = [
   }
 ];
 
-const AdminOrders = () => {
+const CustomModal: React.FC<CustomModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  title, 
+  message, 
+  onConfirm, 
+  confirmText, 
+  cancelText, 
+  children 
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center gap-3 text-red-600 mb-4">
+          <AlertCircle className="h-6 w-6" />
+          <h3 className="text-lg font-semibold">{title}</h3>
+        </div>
+        <div className="text-gray-600 mb-6">
+          {message}
+          {children}
+        </div>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            {cancelText || 'بستن'}
+          </button>
+          {onConfirm && (
+            <button
+              onClick={onConfirm}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              {confirmText || 'تایید'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AdminOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [startDate, setStartDate] = useState<DayObject | null>(null);
   const [endDate, setEndDate] = useState<DayObject | null>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [showGenerateInvoiceModal, setShowGenerateInvoiceModal] = useState(false);
+  const [showInvoiceDatePicker, setShowInvoiceDatePicker] = useState(false);
+  const [messageModal, setMessageModal] = useState<{ isOpen: boolean; title: string; message: string }>({
+    isOpen: false,
+    title: '',
+    message: ''
+  });
+  const [newInvoice, setNewInvoice] = useState({
+    customerName: '',
+    date: null as DayObject | null,
+    status: 'pending_payment' as Order['status'],
+    items: [{ title: '', quantity: 1, price: '' }],
+  });
 
-  // Filter orders based on search term, status, and date range
+  const showMessage = (title: string, message: string) => {
+    setMessageModal({ isOpen: true, title, message });
+  };
+
+  const formatDate = (date: DayObject | null): string => {
+    if (!date) return '';
+    return `${date.year}/${String(date.month).padStart(2, '0')}/${String(date.day).padStart(2, '0')}`;
+  };
+
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.customerName.includes(searchTerm) || 
-                         order.id.includes(searchTerm);
+    const matchesSearch = 
+      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      order.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !selectedStatus || order.status === selectedStatus;
-    
     return matchesSearch && matchesStatus;
   });
 
@@ -113,15 +189,64 @@ const AdminOrders = () => {
   };
 
   const handleDownloadInvoice = (order: Order) => {
-    alert(`دانلود فاکتور سفارش ${order.id}`);
+    showMessage('موفقیت', `فاکتور سفارش ${order.id} با موفقیت دانلود شد`);
   };
 
-  const formatDate = (date: DayObject | null) => {
-    if (!date) return '';
-    return `${date.year}/${String(date.month).padStart(2, '0')}/${String(date.day).padStart(2, '0')}`;
+  const handleGenerateInvoice = () => {
+    setShowGenerateInvoiceModal(true);
   };
 
-  const getStatusBadgeClass = (status: Order['status']) => {
+  const confirmGenerateInvoice = () => {
+    if (!newInvoice.customerName || !newInvoice.date || newInvoice.items.some(item => !item.title || !item.price)) {
+      showMessage('خطا', 'لطفاً همه فیلدها را پر کنید');
+      return;
+    }
+
+    const invalidPrice = newInvoice.items.some(item => isNaN(parseInt(item.price)));
+    if (invalidPrice) {
+      showMessage('خطا', 'قیمت باید فقط شامل اعداد باشد');
+      return;
+    }
+
+    const total = newInvoice.items.reduce((sum, item) => {
+      const priceNum = parseInt(item.price) || 0;
+      return sum + (priceNum * item.quantity);
+    }, 0);
+
+    const newOrder: Order = {
+      id: `#${Math.floor(1000 + Math.random() * 9000)}`,
+      customerName: newInvoice.customerName,
+      date: formatDate(newInvoice.date),
+      total: `${total.toLocaleString('fa-IR')} تومان`,
+      status: newInvoice.status,
+      items: newInvoice.items.map(item => ({
+        title: item.title,
+        quantity: item.quantity,
+        price: `${parseInt(item.price).toLocaleString('fa-IR')} تومان`
+      }))
+    };
+
+    setOrders([...orders, newOrder]);
+    setShowGenerateInvoiceModal(false);
+    setNewInvoice({ customerName: '', date: null, status: 'pending_payment', items: [{ title: '', quantity: 1, price: '' }] });
+    showMessage('موفقیت', 'فاکتور جدید با موفقیت ایجاد شد');
+  };
+
+  const addItemField = () => {
+    setNewInvoice({
+      ...newInvoice,
+      items: [...newInvoice.items, { title: '', quantity: 1, price: '' }]
+    });
+  };
+
+  const updateItemField = (index: number, field: keyof Order['items'][0], value: string | number) => {
+    const updatedItems = newInvoice.items.map((item, i) => 
+      i === index ? { ...item, [field]: value } : item
+    );
+    setNewInvoice({ ...newInvoice, items: updatedItems });
+  };
+
+  const getStatusBadgeClass = (status: Order['status']): string => {
     switch (status) {
       case 'pending_payment':
         return 'bg-orange-100 text-orange-800';
@@ -138,7 +263,7 @@ const AdminOrders = () => {
     }
   };
 
-  const getStatusText = (status: Order['status']) => {
+  const getStatusText = (status: Order['status']): string => {
     switch (status) {
       case 'pending_payment':
         return 'در انتظار پرداخت';
@@ -162,7 +287,16 @@ const AdminOrders = () => {
       </Helmet>
 
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">مدیریت سفارشات</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">مدیریت سفارشات</h1>
+          <button 
+            onClick={handleGenerateInvoice}
+            className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <Plus className="h-5 w-5" />
+            ایجاد فاکتور جدید
+          </button>
+        </div>
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -345,6 +479,109 @@ const AdminOrders = () => {
           </div>
         </div>
       )}
+
+      {/* Generate Invoice Modal */}
+      <CustomModal
+        isOpen={showGenerateInvoiceModal}
+        onClose={() => setShowGenerateInvoiceModal(false)}
+        title="ایجاد فاکتور جدید"
+        message=""
+        onConfirm={confirmGenerateInvoice}
+        confirmText="ایجاد"
+        cancelText="انصراف"
+      >
+        <div className="space-y-4">
+          <input
+            type="text"
+            value={newInvoice.customerName}
+            onChange={(e) => setNewInvoice({ ...newInvoice, customerName: e.target.value })}
+            placeholder="نام مشتری"
+            className="w-full p-2 border rounded-lg"
+          />
+          <div className="relative">
+            <div 
+              className="w-full py-2 px-4 border rounded-lg flex items-center justify-between cursor-pointer hover:border-blue-500"
+              onClick={() => setShowInvoiceDatePicker(true)}
+            >
+              <span className={newInvoice.date ? 'text-gray-900' : 'text-gray-500'}>
+                {newInvoice.date ? formatDate(newInvoice.date) : 'انتخاب تاریخ'}
+              </span>
+              <Calendar className="h-5 w-5 text-gray-400" />
+            </div>
+            {showInvoiceDatePicker && (
+              <div className="absolute top-full right-0 mt-1 z-50">
+                <DatePicker
+                  value={newInvoice.date}
+                  onChange={date => {
+                    setNewInvoice({ ...newInvoice, date });
+                    setShowInvoiceDatePicker(false);
+                  }}
+                  locale="fa"
+                  shouldHighlightWeekends
+                  inputPlaceholder="انتخاب تاریخ"
+                />
+              </div>
+            )}
+          </div>
+          <select
+            value={newInvoice.status}
+            onChange={(e) => setNewInvoice({ ...newInvoice, status: e.target.value as Order['status'] })}
+            className="w-full p-2 border rounded-lg"
+          >
+            <option value="pending_payment">در انتظار پرداخت</option>
+            <option value="processing">در حال پردازش</option>
+            <option value="shipped">ارسال شده</option>
+            <option value="delivered">تحویل شده</option>
+            <option value="cancelled">لغو شده</option>
+          </select>
+          <div>
+            <p className="text-gray-600 mb-2">اقلام فاکتور</p>
+            {newInvoice.items.map((item, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={item.title}
+                  onChange={(e) => updateItemField(index, 'title', e.target.value)}
+                  placeholder="عنوان"
+                  className="w-1/3 p-2 border rounded-lg"
+                />
+                <input
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) => updateItemField(index, 'quantity', parseInt(e.target.value) || 1)}
+                  min="1"
+                  placeholder="تعداد"
+                  className="w-1/3 p-2 border rounded-lg"
+                />
+                <input
+                  type="text"
+                  value={item.price}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, ''); // Only allow numbers
+                    updateItemField(index, 'price', value);
+                  }}
+                  placeholder="قیمت (فقط عدد)"
+                  className="w-1/3 p-2 border rounded-lg"
+                />
+              </div>
+            ))}
+            <button
+              onClick={addItemField}
+              className="text-blue-600 hover:text-blue-800"
+            >
+              + افزودن قلم دیگر
+            </button>
+          </div>
+        </div>
+      </CustomModal>
+
+      {/* Message Modal */}
+      <CustomModal
+        isOpen={messageModal.isOpen}
+        onClose={() => setMessageModal({ isOpen: false, title: '', message: '' })}
+        title={messageModal.title}
+        message={messageModal.message}
+      />
     </>
   );
 };
