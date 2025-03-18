@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Star, Search, Filter, BookOpen, Download } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Books = () => {
   const [selectedFormat, setSelectedFormat] = useState<'all' | 'print' | 'ebook'>('all');
@@ -17,7 +18,8 @@ const Books = () => {
       image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400',
       rating: 4.7,
       format: 'both',
-      description: 'رمانی ماندگار از ادبیات معاصر ایران که روایتگر داستانی عاشقانه در بستر تاریخ است.'
+      description: 'رمانی ماندگار از ادبیات معاصر ایران که روایتگر داستانی عاشقانه در بستر تاریخ است.',
+      category: 'ادبیات داستانی',
     },
     {
       id: 2,
@@ -162,40 +164,39 @@ const Books = () => {
               whileHover={{ scale: 1.02 }}
               className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="relative">
-                <img src={book.image} alt={book.title} className="w-full h-48 object-cover" />
-                <div className="absolute top-2 left-2 flex space-x-2 rtl:space-x-reverse">
-                  {(book.format === 'ebook' || book.format === 'both') && (
-                    <span className="bg-primary-500 text-white px-2 py-1 rounded-md text-sm flex items-center">
-                      <Download className="h-4 w-4 ml-1" />
-                      الکترونیک
-                    </span>
-                  )}
-                  {(book.format === 'print' || book.format === 'both') && (
-                    <span className="bg-gray-700 text-white px-2 py-1 rounded-md text-sm flex items-center">
-                      <BookOpen className="h-4 w-4 ml-1" />
-                      چاپی
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{book.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-2">{book.author}</p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2">{book.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-primary-600 dark:text-primary-400 font-bold">
-                    {book.price.toLocaleString()} تومان
-                  </span>
-                  <div className="flex items-center">
-                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    <span className="mr-1 text-gray-600 dark:text-gray-300">{book.rating}</span>
+              <Link to={`/books/${book.id}`} className="block">
+                <div className="relative">
+                  <img src={book.image} alt={book.title} className="w-full h-48 object-cover" />
+                  <div className="absolute top-2 left-2 flex space-x-2 rtl:space-x-reverse">
+                    {(book.format === 'ebook' || book.format === 'both') && (
+                      <span className="bg-primary-500 text-white px-2 py-1 rounded-md text-sm flex items-center">
+                        <Download className="h-4 w-4 ml-1" />
+                        الکترونیک
+                      </span>
+                    )}
+                    {(book.format === 'print' || book.format === 'both') && (
+                      <span className="bg-gray-700 text-white px-2 py-1 rounded-md text-sm flex items-center">
+                        <BookOpen className="h-4 w-4 ml-1" />
+                        چاپی
+                      </span>
+                    )}
                   </div>
                 </div>
-                <button className="mt-4 w-full bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 transition-colors">
-                  افزودن به سبد خرید
-                </button>
-              </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{book.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2">{book.author}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2">{book.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-primary-600 dark:text-primary-400 font-bold">
+                      {book.price.toLocaleString()} تومان
+                    </span>
+                    <div className="flex items-center">
+                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      <span className="mr-1 text-gray-600 dark:text-gray-300">{book.rating}</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
             </motion.div>
           ))}
         </div>

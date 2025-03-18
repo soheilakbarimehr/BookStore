@@ -146,7 +146,7 @@ const Layout = () => {
           </div>
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <p className="text-center text-gray-400 dark:text-gray-500">
-              © ۱۴۰۲ کتاب‌خانه. تمامی حقوق محفوظ است.
+              © ۱۴۰۴ کتاب‌خانه. تمامی حقوق محفوظ است.
             </p>
           </div>
         </div>

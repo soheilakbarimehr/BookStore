@@ -1,6 +1,8 @@
+// src/pages/Categories.tsx
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { BookOpen, Users, Brain, Palette, History, Baby, GraduationCap, Heart, Compass, Music, Coffee, Lightbulb } from 'lucide-react';
 
 const Categories = () => {
@@ -11,7 +13,7 @@ const Categories = () => {
       icon: BookOpen,
       description: 'رمان‌ها، داستان‌های کوتاه و ادبیات کلاسیک',
       count: 2547,
-      subcategories: ['رمان خارجی', 'رمان ایرانی', 'داستان کوتاه', 'ادبیات کلاسیک']
+      subcategories: ['رمان خارجی', 'رمان ایرانی', 'داستان کوتاه', 'ادبیات کلاسیک'],
     },
     {
       id: 2,
@@ -19,7 +21,7 @@ const Categories = () => {
       icon: Users,
       description: 'روانشناسی، جامعه‌شناسی و علوم اجتماعی',
       count: 1823,
-      subcategories: ['روانشناسی', 'جامعه‌شناسی', 'فلسفه', 'تاریخ']
+      subcategories: ['روانشناسی', 'جامعه‌شناسی', 'فلسفه', 'تاریخ'],
     },
     {
       id: 3,
@@ -27,7 +29,7 @@ const Categories = () => {
       icon: Brain,
       description: 'موفقیت، مدیریت زمان و خودشناسی',
       count: 956,
-      subcategories: ['موفقیت', 'مدیریت زمان', 'خودشناسی', 'ارتباطات']
+      subcategories: ['موفقیت', 'مدیریت زمان', 'خودشناسی', 'ارتباطات'],
     },
     {
       id: 4,
@@ -35,7 +37,7 @@ const Categories = () => {
       icon: Palette,
       description: 'نقاشی، موسیقی، سینما و عکاسی',
       count: 745,
-      subcategories: ['نقاشی', 'موسیقی', 'سینما', 'عکاسی']
+      subcategories: ['نقاشی', 'موسیقی', 'سینما', 'عکاسی'],
     },
     {
       id: 5,
@@ -43,7 +45,7 @@ const Categories = () => {
       icon: History,
       description: 'تاریخ ایران و جهان، باستان‌شناسی',
       count: 1234,
-      subcategories: ['تاریخ ایران', 'تاریخ جهان', 'باستان‌شناسی', 'تاریخ معاصر']
+      subcategories: ['تاریخ ایران', 'تاریخ جهان', 'باستان‌شناسی', 'تاریخ معاصر'],
     },
     {
       id: 6,
@@ -51,7 +53,7 @@ const Categories = () => {
       icon: Baby,
       description: 'داستان‌های کودکان و نوجوانان',
       count: 1567,
-      subcategories: ['داستان کودک', 'داستان نوجوان', 'شعر کودک', 'آموزشی']
+      subcategories: ['داستان کودک', 'داستان نوجوان', 'شعر کودک', 'آموزشی'],
     },
     {
       id: 7,
@@ -59,7 +61,7 @@ const Categories = () => {
       icon: GraduationCap,
       description: 'کتاب‌های درسی و کمک آموزشی',
       count: 890,
-      subcategories: ['کتب درسی', 'کنکور', 'زبان خارجی', 'برنامه‌نویسی']
+      subcategories: ['کتب درسی', 'کنکور', 'زبان خارجی', 'برنامه‌نویسی'],
     },
     {
       id: 8,
@@ -67,7 +69,7 @@ const Categories = () => {
       icon: Heart,
       description: 'داستان‌های عاشقانه و رمانتیک',
       count: 678,
-      subcategories: ['رمان عاشقانه', 'شعر عاشقانه', 'داستان کوتاه', 'ادبیات کلاسیک']
+      subcategories: ['رمان عاشقانه', 'شعر عاشقانه', 'داستان کوتاه', 'ادبیات کلاسیک'],
     },
     {
       id: 9,
@@ -75,7 +77,7 @@ const Categories = () => {
       icon: Compass,
       description: 'سفرنامه‌ها و داستان‌های ماجراجویی',
       count: 432,
-      subcategories: ['سفرنامه', 'راهنمای سفر', 'ماجراجویی', 'طبیعت‌گردی']
+      subcategories: ['سفرنامه', 'راهنمای سفر', 'ماجراجویی', 'طبیعت‌گردی'],
     },
     {
       id: 10,
@@ -83,7 +85,7 @@ const Categories = () => {
       icon: Music,
       description: 'تئاتر، سینما و موسیقی',
       count: 345,
-      subcategories: ['تئاتر', 'سینما', 'موسیقی', 'نمایشنامه']
+      subcategories: ['تئاتر', 'سینما', 'موسیقی', 'نمایشنامه'],
     },
     {
       id: 11,
@@ -91,7 +93,7 @@ const Categories = () => {
       icon: Coffee,
       description: 'آشپزی، دکوراسیون و سلامتی',
       count: 789,
-      subcategories: ['آشپزی', 'دکوراسیون', 'سلامتی', 'ورزش']
+      subcategories: ['آشپزی', 'دکوراسیون', 'سلامتی', 'ورزش'],
     },
     {
       id: 12,
@@ -99,8 +101,8 @@ const Categories = () => {
       icon: Lightbulb,
       description: 'فیزیک، شیمی و زیست‌شناسی',
       count: 567,
-      subcategories: ['فیزیک', 'شیمی', 'زیست‌شناسی', 'نجوم']
-    }
+      subcategories: ['فیزیک', 'شیمی', 'زیست‌شناسی', 'نجوم'],
+    },
   ];
 
   return (
@@ -124,30 +126,32 @@ const Categories = () => {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow"
               >
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <Icon className="h-10 w-10 text-primary-600 dark:text-primary-400" />
-                  </div>
-                  <div className="mr-4 flex-1">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                      {category.title}
-                      <span className="mr-2 text-sm text-gray-500 dark:text-gray-400">
-                        ({category.count.toLocaleString()})
-                      </span>
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">{category.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {category.subcategories.map((sub) => (
-                        <span
-                          key={sub}
-                          className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm"
-                        >
-                          {sub}
+                <Link to={`/category/${encodeURIComponent(category.title)}`}>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <Icon className="h-10 w-10 text-primary-600 dark:text-primary-400" />
+                    </div>
+                    <div className="mr-4 flex-1">
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                        {category.title}
+                        <span className="mr-2 text-sm text-gray-500 dark:text-gray-400">
+                          ({category.count.toLocaleString()})
                         </span>
-                      ))}
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">{category.description}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {category.subcategories.map((sub) => (
+                          <span
+                            key={sub}
+                            className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm"
+                          >
+                            {sub}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </motion.div>
             );
           })}
