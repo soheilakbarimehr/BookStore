@@ -1,0 +1,7 @@
+/* src/components/HeroSlider.css */
+@media (max-width: 640px) {
+    .swiper-button-next,
+    .swiper-button-prev {
+      display: none !important;
+    }
+  }

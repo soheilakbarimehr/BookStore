@@ -1,7 +1,7 @@
-// src/App.tsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import { HomeContentProvider } from './context/HomeContentContext'; // اضافه کردن
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Books from './pages/Books';
@@ -21,6 +21,10 @@ import AdminBooks from './pages/admin/Books';
 import AdminOrders from './pages/admin/Orders';
 import AdminUsers from './pages/admin/Users';
 import AdminSettings from './pages/admin/Settings';
+import CategoriesSettings from './pages/admin/CategoriesSettings';
+import BooksSettings from './pages/admin/BooksSettings';
+import HomeSettings from './pages/admin/HomeSettings';
+import AboutSettings from './pages/admin/AboutSettings';
 
 // تعریف دیتای کتاب‌ها
 const booksData = [
@@ -69,29 +73,37 @@ const booksData = [
 function App() {
   return (
     <CartProvider>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="books" element={<Books books={booksData} />} />
-          <Route path="books/:id" element={<BookDetails books={booksData} />} />
-          <Route path="categories" element={<Categories />} />
-          <Route path="category/:category" element={<CategoryBooks books={booksData} />} />
-          <Route path="about" element={<About />} />
-          <Route path="faq" element={<FAQ />} />
-          <Route path="shipping" element={<Shipping />} />
-          <Route path="returns" element={<Returns />} />
-          <Route path="warranty" element={<Warranty />} />
-          <Route path="cart" element={<Cart />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-        <Route path="/admin" element={<AdminLayout />}>
-  <Route index element={<Dashboard />} />
-  <Route path="books" element={<AdminBooks />} />
-  <Route path="orders" element={<AdminOrders />} />
-  <Route path="users" element={<AdminUsers />} />
-  <Route path="settings" element={<AdminSettings />} />
-</Route>
-      </Routes>
+      <HomeContentProvider>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home books={booksData} />} />
+            <Route path="books" element={<Books books={booksData} />} />
+            <Route path="books/:id" element={<BookDetails books={booksData} />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="category/:category" element={<CategoryBooks books={booksData} />} />
+            <Route path="about" element={<About />} />
+            <Route path="faq" element={<FAQ />} />
+            <Route path="shipping" element={<Shipping />} />
+            <Route path="returns" element={<Returns />} />
+            <Route path="warranty" element={<Warranty />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="books" element={<AdminBooks />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="settings" element={<AdminSettings />} />
+            <Route path="page-settings">
+              <Route path="categories" element={<CategoriesSettings />} />
+              <Route path="books" element={<BooksSettings />} />
+              <Route path="home" element={<HomeSettings />} />
+              <Route path="about" element={<AboutSettings />} />
+            </Route>
+          </Route>
+        </Routes>
+      </HomeContentProvider>
     </CartProvider>
   );
 }

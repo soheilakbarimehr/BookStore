@@ -30,21 +30,31 @@
   }
 }
 
+/* Hide navigation arrows on mobile */
+@media (max-width: 768px) {
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none !important;
+  }
+}
+
 /* Animation classes */
-.fade-enter {
-  opacity: 0;
-}
+@layer utilities {
+  .fade-enter {
+    opacity: 0;
+  }
 
-.fade-enter-active {
-  opacity: 1;
-  transition: opacity 200ms ease-in;
-}
+  .fade-enter-active {
+    opacity: 1;
+    transition: opacity 200ms ease-in;
+  }
 
-.fade-exit {
-  opacity: 1;
-}
+  .fade-exit {
+    opacity: 1;
+  }
 
-.fade-exit-active {
-  opacity: 0;
-  transition: opacity 200ms ease-in;
+  .fade-exit-active {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+  }
 }

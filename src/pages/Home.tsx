@@ -1,248 +1,107 @@
+// src/pages/Home.tsx
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { motion } from 'framer-motion';
-import { Book, Star, TrendingUp, Truck, CreditCard, Headphones } from 'lucide-react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import HeroSlider from '../components/HeroSlider';
+import FeaturedBooks from '../components/FeaturedBooks';
+import Features from '../components/Features';
+import { useHomeContent } from '../context/HomeContentContext';
 
-const Home = () => {
-  const featuredBooks = [
-    {
-      id: 1,
-      title: 'صد سال تنهایی',
-      author: 'گابریل گارسیا مارکز',
-      price: 120000,
-      image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400',
-      rating: 4.8
-    },
-    {
-      id: 2,
-      title: 'کیمیاگر',
-      author: 'پائولو کوئیلو',
-      price: 85000,
-      image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=400',
-      rating: 4.6
-    },
-    {
-      id: 3,
-      title: 'بوف کور',
-      author: 'صادق هدایت',
-      price: 95000,
-      image: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=400',
-      rating: 4.7
-    },
-    {
-      id: 4,
-      title: 'شازده کوچولو',
-      author: 'آنتوان دو سنت‌اگزوپری',
-      price: 75000,
-      image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400',
-      rating: 4.9
-    }
-  ];
+interface Book {
+  id: number;
+  title: { fa: string; en: string };
+  author: { fa: string; en: string };
+  price: number;
+  image: string;
+  rating?: number;
+  format: string;
+  description: { fa: string; en: string };
+  category: string;
+}
 
-  const newReleases = [
-    {
-      id: 5,
-      title: 'جنگ و صلح',
-      author: 'لئو تولستوی',
-      price: 150000,
-      image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=400'
-    },
-    {
-      id: 6,
-      title: 'دن کیشوت',
-      author: 'میگل د سروانتس',
-      price: 130000,
-      image: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=400'
-    },
-    {
-      id: 7,
-      title: 'مسخ',
-      author: 'فرانتس کافکا',
-      price: 90000,
-      image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400'
-    }
-  ];
+interface HomeProps {
+  books: Book[];
+}
+
+interface Slide {
+  id: number;
+  title: { fa: string; en: string };
+  description: { fa: string; en: string };
+  image: string;
+  buttonLink: string;
+}
+
+interface Feature {
+  title: { fa: string; en: string };
+  description: { fa: string; en: string };
+  icon: 'Truck' | 'CreditCard' | 'Headphones';
+}
+
+interface Section {
+  id: number;
+  title: { fa: string; en: string };
+  type: 'featured-books' | 'latest-books' | 'features' | 'custom';
+  content: string[] | Feature[] | string;
+  visible: boolean;
+}
+
+const mockBooks: Book[] = [
+  { id: 1, title: { fa: 'کتاب ویژه 1', en: 'Featured Book 1' }, author: { fa: 'نویسنده 1', en: 'Author 1' }, price: 50000, image: 'book1.jpg', rating: 4.5, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'رمان' },
+  { id: 2, title: { fa: 'کتاب ویژه 2', en: 'Featured Book 2' }, author: { fa: 'نویسنده 2', en: 'Author 2' }, price: 60000, image: 'book2.jpg', rating: 4.0, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'علمی' },
+  { id: 3, title: { fa: 'کتاب ویژه 3', en: 'Featured Book 3' }, author: { fa: 'نویسنده 3', en: 'Author 3' }, price: 70000, image: 'book3.jpg', rating: 4.8, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'تاریخی' },
+  { id: 4, title: { fa: 'کتاب ویژه 4', en: 'Featured Book 4' }, author: { fa: 'نویسنده 4', en: 'Author 4' }, price: 80000, image: 'book4.jpg', rating: 4.2, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'کودکان' },
+  { id: 5, title: { fa: 'کتاب ویژه 5', en: 'Featured Book 5' }, author: { fa: 'نویسنده 5', en: 'Author 5' }, price: 90000, image: 'book5.jpg', rating: 4.7, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'شعر' },
+  { id: 6, title: { fa: 'کتاب جدید 1', en: 'Latest Book 1' }, author: { fa: 'نویسنده 6', en: 'Author 6' }, price: 55000, image: 'book6.jpg', rating: 4.3, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'رمان' },
+  { id: 7, title: { fa: 'کتاب جدید 2', en: 'Latest Book 2' }, author: { fa: 'نویسنده 7', en: 'Author 7' }, price: 65000, image: 'book7.jpg', rating: 4.1, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'علمی' },
+  { id: 8, title: { fa: 'کتاب جدید 3', en: 'Latest Book 3' }, author: { fa: 'نویسنده 8', en: 'Author 8' }, price: 75000, image: 'book8.jpg', rating: 4.9, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'تاریخی' },
+  { id: 9, title: { fa: 'کتاب جدید 4', en: 'Latest Book 4' }, author: { fa: 'نویسنده 9', en: 'Author 9' }, price: 85000, image: 'book9.jpg', rating: 4.4, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'کودکان' },
+  { id: 10, title: { fa: 'کتاب جدید 5', en: 'Latest Book 5' }, author: { fa: 'نویسنده 10', en: 'Author 10' }, price: 95000, image: 'book10.jpg', rating: 4.6, format: 'چاپی', description: { fa: 'توضیحات', en: 'Description' }, category: 'شعر' },
+];
+
+const Home: React.FC<HomeProps> = () => {
+  const { homeContent } = useHomeContent();
+  const lang = 'fa';
 
   return (
     <>
       <Helmet>
-        <title>کتاب‌خانه | فروشگاه آنلاین کتاب</title>
-        <meta name="description" content="خرید آنلاین کتاب‌های الکترونیکی و چاپی با بهترین قیمت و ارسال سریع" />
+        <title>{lang === 'fa' ? 'کتاب‌خانه | فروشگاه آنلاین کتاب' : 'Bookstore | Online Book Shop'}</title>
+        <meta
+          name="description"
+          content={
+            lang === 'fa'
+              ? 'خرید آنلاین کتاب‌های الکترونیکی و چاپی با بهترین قیمت و ارسال سریع'
+              : 'Buy e-books and printed books online with the best prices and fast delivery'
+          }
+        />
       </Helmet>
 
-      {/* Hero Section with Slider */}
-      <section className="relative">
-        <Swiper
-          modules={[Navigation, Pagination, Autoplay]}
-          navigation
-          pagination={{ clickable: true }}
-          autoplay={{ delay: 5000 }}
-          className="h-[500px]"
-        >
-          <SwiperSlide>
-            <div className="h-full bg-gradient-to-r from-primary-700 to-primary-900 flex items-center">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-                <h1 className="text-4xl md:text-6xl font-bold mb-6">دنیای کتاب در دستان شما</h1>
-                <p className="text-xl md:text-2xl mb-8">بیش از ۱۰،۰۰۰ عنوان کتاب الکترونیکی و چاپی</p>
-                <button className="bg-white text-primary-700 px-8 py-3 rounded-full text-lg font-semibold hover:bg-opacity-90 transition-all">
-                  شروع به خرید
-                </button>
+      {homeContent.slider.length > 0 && <HeroSlider slides={homeContent.slider} lang={lang} />}
+
+      <div className="py-16">
+        {homeContent.sections
+          .filter((section: Section) => section.visible)
+          .map((section: Section) => (
+            <section
+              key={section.id}
+              className={`py-16 ${section.type === 'features' ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}`}
+            >
+              <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <h2 className="mb-8 text-3xl font-bold text-gray-900 dark:text-white">
+                  {lang === 'fa' ? section.title.fa : section.title.en}
+                </h2>
+
+                {(section.type === 'featured-books' || section.type === 'latest-books') && Array.isArray(section.content) && (
+                  <FeaturedBooks books={mockBooks} bookIds={section.content as string[]} lang={lang} />
+                )}
+                {section.type === 'features' && Array.isArray(section.content) && (
+                  <Features features={section.content as Feature[]} lang={lang} />
+                )}
               </div>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="h-full bg-gradient-to-r from-primary-800 to-primary-600 flex items-center">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-                <h2 className="text-4xl md:text-6xl font-bold mb-6">تخفیف ویژه کتاب‌های الکترونیکی</h2>
-                <p className="text-xl md:text-2xl mb-8">تا ۵۰٪ تخفیف برای خرید کتاب‌های الکترونیکی</p>
-                <button className="bg-white text-primary-700 px-8 py-3 rounded-full text-lg font-semibold hover:bg-opacity-90 transition-all">
-                  مشاهده تخفیف‌ها
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-      </section>
+            </section>
+          ))}
+      </div>
 
-      {/* Features */}
-      <section className="py-12 bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Truck className="h-12 w-12 text-primary-600" />,
-                title: 'ارسال سریع',
-                description: 'ارسال رایگان برای سفارش‌های بالای ۵۰۰ هزار تومان'
-              },
-              {
-                icon: <CreditCard className="h-12 w-12 text-primary-600" />,
-                title: 'پرداخت امن',
-                description: 'پرداخت اینترنتی مطمئن با درگاه‌های معتبر'
-              },
-              {
-                icon: <Headphones className="h-12 w-12 text-primary-600" />,
-                title: 'پشتیبانی ۲۴/۷',
-                description: 'پاسخگویی به سوالات شما در تمام ساعات'
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
-                className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
-              >
-                <div className="flex justify-center mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Books */}
-      <section className="py-16 bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">کتاب‌های پرفروش</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {featuredBooks.map((book) => (
-              <motion.div
-                key={book.id}
-                whileHover={{ scale: 1.05 }}
-                className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-              >
-                <img src={book.image} alt={book.title} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{book.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-2">{book.author}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-primary-600 dark:text-primary-400 font-bold">
-                      {book.price.toLocaleString()} تومان
-                    </span>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="mr-1 text-gray-600 dark:text-gray-300">{book.rating}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* New Releases Slider */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">تازه‌های کتاب</h2>
-          <Swiper
-            modules={[Navigation, Pagination]}
-            navigation
-            pagination={{ clickable: true }}
-            breakpoints={{
-              640: { slidesPerView: 2, spaceBetween: 20 },
-              768: { slidesPerView: 3, spaceBetween: 30 },
-              1024: { slidesPerView: 4, spaceBetween: 30 }
-            }}
-          >
-            {newReleases.map((book) => (
-              <SwiperSlide key={book.id}>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden"
-                >
-                  <img src={book.image} alt={book.title} className="w-full h-48 object-cover" />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{book.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-2">{book.author}</p>
-                    <span className="text-primary-600 dark:text-primary-400 font-bold">
-                      {book.price.toLocaleString()} تومان
-                    </span>
-                  </div>
-                </motion.div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="py-16 bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">دسته‌بندی‌ها</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {[
-              'رمان',
-              'علمی',
-              'تاریخی',
-              'روانشناسی',
-              'کودک',
-              'آموزشی',
-              'هنر',
-              'فلسفه',
-              'دین',
-              'سیاسی',
-              'اقتصاد',
-              'زندگی‌نامه'
-            ].map((category) => (
-              <motion.div
-                key={category}
-                whileHover={{ scale: 1.05 }}
-                className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-center cursor-pointer"
-              >
-                <Book className="h-12 w-12 mx-auto mb-4 text-primary-600 dark:text-primary-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{category}</h3>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      
     </>
   );
 };

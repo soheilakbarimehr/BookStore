@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { 
   Search,
@@ -6,10 +6,16 @@ import {
   Download,
   Plus,
   AlertCircle,
-  Calendar
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUp,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
-import DatePicker from '@hassanmojab/react-modern-calendar-datepicker';
+import DatePicker, { DayValue } from '@hassanmojab/react-modern-calendar-datepicker';
 import '@hassanmojab/react-modern-calendar-datepicker/lib/DatePicker.css';
+import { useOutletContext } from 'react-router-dom';
 
 interface Order {
   id: string;
@@ -22,12 +28,6 @@ interface Order {
     quantity: number;
     price: string;
   }[];
-}
-
-interface DayObject {
-  year: number;
-  month: number;
-  day: number;
 }
 
 interface CustomModalProps {
@@ -45,7 +45,7 @@ const initialOrders: Order[] = [
   {
     id: "#۱۲۳۴",
     customerName: "علی محمدی",
-    date: "۱۴۰۴/۰۱/۰۱",
+    date: "1404/01/01",
     total: "۲۵۰،۰۰۰ تومان",
     status: "processing",
     items: [
@@ -56,7 +56,7 @@ const initialOrders: Order[] = [
   {
     id: "#۱۲۳۵",
     customerName: "مریم حسینی",
-    date: "۱۴۰۴/۰۱/۰۱",
+    date: "1404/01/01",
     total: "۳۵۰،۰۰۰ تومان",
     status: "pending_payment",
     items: [
@@ -67,7 +67,7 @@ const initialOrders: Order[] = [
   {
     id: "#۱۲۳۶",
     customerName: "رضا کریمی",
-    date: "۱۴۰۳/۱۲/۲۹",
+    date: "1403/12/29",
     total: "۴۵۰،۰۰۰ تومان",
     status: "delivered",
     items: [
@@ -78,7 +78,7 @@ const initialOrders: Order[] = [
   {
     id: "#۱۲۳۷",
     customerName: "زهرا نوری",
-    date: "۱۴۰۳/۱۲/۲۸",
+    date: "1403/12/28",
     total: "۱۱۰،۰۰۰ تومان",
     status: "shipped",
     items: [
@@ -88,12 +88,287 @@ const initialOrders: Order[] = [
   {
     id: "#۱۲۳۸",
     customerName: "امیر تهرانی",
-    date: "۱۴۰۳/۱۲/۲۷",
+    date: "1403/12/27",
     total: "۱۷۰،۰۰۰ تومان",
     status: "cancelled",
     items: [
       { title: "بوف کور", quantity: 1, price: "۹۵،۰۰۰ تومان" },
       { title: "هنر جنگ", quantity: 1, price: "۷۵،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۳۹",
+    customerName: "فاطمه احمدی",
+    date: "1403/12/26",
+    total: "۳۲۰،۰۰۰ تومان",
+    status: "processing",
+    items: [
+      { title: "شازده کوچولو", quantity: 2, price: "۱۲۰،۰۰۰ تومان" },
+      { title: "جزء از کل", quantity: 1, price: "۱۸۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۰",
+    customerName: "حسین رضایی",
+    date: "1403/12/25",
+    total: "۲۱۰،۰۰۰ تومان",
+    status: "delivered",
+    items: [
+      { title: "ناتور دشت", quantity: 1, price: "۹۰،۰۰۰ تومان" },
+      { title: "خورشید همچنان می‌دمد", quantity: 1, price: "۱۲۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۱",
+    customerName: "نرگس موسوی",
+    date: "1403/12/24",
+    total: "۴۸۰،۰۰۰ تومان",
+    status: "shipped",
+    items: [
+      { title: "جهان در پوست گردو", quantity: 1, price: "۲۲۰،۰۰۰ تومان" },
+      { title: "1984", quantity: 2, price: "۲۳۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۲",
+    customerName: "مهدی کاظمی",
+    date: "1403/12/23",
+    total: "۲۹۰،۰۰۰ تومان",
+    status: "pending_payment",
+    items: [
+      { title: "قلعه حیوانات", quantity: 1, price: "۸۰،۰۰۰ تومان" },
+      { title: "هستی و زمان", quantity: 1, price: "۲۱۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۳",
+    customerName: "سارا جعفری",
+    date: "1403/12/22",
+    total: "۶۵۰،۰۰۰ تومان",
+    status: "delivered",
+    items: [
+      { title: "بینوایان", quantity: 1, price: "۳۰۰،۰۰۰ تومان" },
+      { title: "جنگ و صلح", quantity: 1, price: "۳۵۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۴",
+    customerName: "محمد حسنی",
+    date: "1403/12/21",
+    total: "۳۶۰،۰۰۰ تومان",
+    status: "cancelled",
+    items: [
+      { title: "جنایت و مکافات", quantity: 1, price: "۱۶۰،۰۰۰ تومان" },
+      { title: "برادران کارامازوف", quantity: 1, price: "۲۰۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۵",
+    customerName: "لیلا رحیمی",
+    date: "1403/12/20",
+    total: "۲۲۰،۰۰۰ تومان",
+    status: "processing",
+    items: [
+      { title: "غرور و تعصب", quantity: 1, price: "۱۱۰،۰۰۰ تومان" },
+      { title: "عقل و احساس", quantity: 1, price: "۱۰۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۶",
+    customerName: "بهرام شریفی",
+    date: "1403/12/19",
+    total: "۴۲۰،۰۰۰ تومان",
+    status: "shipped",
+    items: [
+      { title: "کتابخانه نیمه‌شب", quantity: 1, price: "۱۴۰،۰۰۰ تومان" },
+      { title: "انسان در جستجوی معنا", quantity: 2, price: "۲۸۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۷",
+    customerName: "شیما قاسمی",
+    date: "1403/12/18",
+    total: "۳۷۰،۰۰۰ تومان",
+    status: "delivered",
+    items: [
+      { title: "قدرت عادت", quantity: 1, price: "۱۲۰،۰۰۰ تومان" },
+      { title: "هری پاتر و سنگ جادو", quantity: 1, price: "۱۵۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۸",
+    customerName: "پیمان علوی",
+    date: "1403/12/17",
+    total: "۴۹۰،۰۰۰ تومان",
+    status: "pending_payment",
+    items: [
+      { title: "هری پاتر و تالار اسرار", quantity: 1, price: "۱۶۰،۰۰۰ تومان" },
+      { title: "ارباب حلقه‌ها: یاران حلقه", quantity: 1, price: "۲۲۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۴۹",
+    customerName: "آتنا مرادی",
+    date: "1403/12/16",
+    total: "۳۳۰،۰۰۰ تومان",
+    status: "processing",
+    items: [
+      { title: "ارباب حلقه‌ها: دو برج", quantity: 1, price: "۲۳۰،۰۰۰ تومان" },
+      { title: "هابیت", quantity: 1, price: "۱۰۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۰",
+    customerName: "کیانوش رستمی",
+    date: "1403/12/15",
+    total: "۲۷۰،۰۰۰ تومان",
+    status: "shipped",
+    items: [
+      { title: "داستان دو شهر", quantity: 1, price: "۱۴۰،۰۰۰ تومان" },
+      { title: "آرزوهای بزرگ", quantity: 1, price: "۱۳۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۱",
+    customerName: "الهام نجفی",
+    date: "1403/12/14",
+    total: "۴۱۰،۰۰۰ تومان",
+    status: "delivered",
+    items: [
+      { title: "کتاب دزد", quantity: 1, price: "۱۶۰،۰۰۰ تومان" },
+      { title: "دختری که پادشاه سوئد را نجات داد", quantity: 1, price: "۱۵۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۲",
+    customerName: "کامران یوسفی",
+    date: "1403/12/13",
+    total: "۲۶۰،۰۰۰ تومان",
+    status: "cancelled",
+    items: [
+      { title: "مردی به نام اوه", quantity: 1, price: "۱۳۰،۰۰۰ تومان" },
+      { title: "جهان سوفی", quantity: 1, price: "۱۳۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۳",
+    customerName: "مینا صادقی",
+    date: "1403/12/12",
+    total: "۳۹۰،۰۰۰ تومان",
+    status: "processing",
+    items: [
+      { title: "کفش‌باز", quantity: 1, price: "۱۶۰،۰۰۰ تومان" },
+      { title: "اثر مرکب", quantity: 1, price: "۱۱۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۴",
+    customerName: "فرهاد زمانی",
+    date: "1403/12/11",
+    total: "۴۳۰،۰۰۰ تومان",
+    status: "shipped",
+    items: [
+      { title: "عادت‌های اتمی", quantity: 1, price: "۱۳۰،۰۰۰ تومان" },
+      { title: "شدن", quantity: 1, price: "۱۷۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۵",
+    customerName: "نسیم خسروی",
+    date: "1403/12/10",
+    total: "۲۵۰،۰۰۰ تومان",
+    status: "delivered",
+    items: [
+      { title: "زندگی دومت وقتی شروع می‌شود", quantity: 1, price: "۱۲۰،۰۰۰ تومان" },
+      { title: "ملت عشق", quantity: 1, price: "۱۳۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۶",
+    customerName: "آرش کاظمی",
+    date: "1403/12/09",
+    total: "۳۱۰،۰۰۰ تومان",
+    status: "pending_payment",
+    items: [
+      { title: "چهل قانون عشق", quantity: 1, price: "۱۵۰،۰۰۰ تومان" },
+      { title: "سه‌شنبه‌ها با موری", quantity: 1, price: "۹۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۷",
+    customerName: "پریناز شریفی",
+    date: "1403/12/08",
+    total: "۲۶۰،۰۰۰ تومان",
+    status: "processing",
+    items: [
+      { title: "پنج نفری که در بهشت ملاقات می‌کنید", quantity: 1, price: "۱۰۰،۰۰۰ تومان" },
+      { title: "کوری", quantity: 1, price: "۱۶۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۸",
+    customerName: "سامان قادری",
+    date: "1403/12/07",
+    total: "۳۴۰،۰۰۰ تومان",
+    status: "shipped",
+    items: [
+      { title: "بینایی", quantity: 1, price: "۱۷۰،۰۰۰ تومان" },
+      { title: "طاعون", quantity: 1, price: "۱۱۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۵۹",
+    customerName: "هانیه رحمانی",
+    date: "1403/12/06",
+    total: "۱۹۰،۰۰۰ تومان",
+    status: "delivered",
+    items: [
+      { title: "بیگانه", quantity: 1, price: "۹۰،۰۰۰ تومان" },
+      { title: "سووشون", quantity: 1, price: "۸۵،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۶۰",
+    customerName: "بهزاد نعمتی",
+    date: "1403/12/05",
+    total: "۴۲۰،۰۰۰ تومان",
+    status: "cancelled",
+    items: [
+      { title: "کیمیاگر", quantity: 2, price: "۲۴۰،۰۰۰ تومان" },
+      { title: "صد سال تنهایی", quantity: 1, price: "۱۵۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۶۱",
+    customerName: "رها حسینی",
+    date: "1403/12/04",
+    total: "۳۷۰،۰۰۰ تومان",
+    status: "processing",
+    items: [
+      { title: "فیزیک کوانتوم", quantity: 1, price: "۲۰۰،۰۰۰ تومان" },
+      { title: "هنر جنگ", quantity: 1, price: "۷۵،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۶۲",
+    customerName: "امید رجبی",
+    date: "1403/12/03",
+    total: "۲۳۰،۰۰۰ تومان",
+    status: "shipped",
+    items: [
+      { title: "مزرعه حیوانات", quantity: 1, price: "۱۱۰،۰۰۰ تومان" },
+      { title: "شازده کوچولو", quantity: 1, price: "۶۰،۰۰۰ تومان" }
+    ]
+  },
+  {
+    id: "#۱۲۶۳",
+    customerName: "شقایق مرتضوی",
+    date: "1403/12/02",
+    total: "۴۱۰،۰۰۰ تومان",
+    status: "delivered",
+    items: [
+      { title: "جزء از کل", quantity: 1, price: "۱۸۰،۰۰۰ تومان" },
+      { title: "ناتور دشت", quantity: 1, price: "۹۰،۰۰۰ تومان" }
     ]
   }
 ];
@@ -112,19 +387,19 @@ const CustomModal: React.FC<CustomModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex items-center gap-3 text-red-600 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-4">
           <AlertCircle className="h-6 w-6" />
-          <h3 className="text-lg font-semibold">{title}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
         </div>
-        <div className="text-gray-600 mb-6">
+        <div className="text-gray-600 dark:text-gray-300 mb-6">
           {message}
           {children}
         </div>
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             {cancelText || 'بستن'}
           </button>
@@ -146,14 +421,11 @@ const AdminOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const [startDate, setStartDate] = useState<DayObject | null>(null);
-  const [endDate, setEndDate] = useState<DayObject | null>(null);
+  const [startDate, setStartDate] = useState<DayValue | null>(null);
+  const [endDate, setEndDate] = useState<DayValue | null>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showGenerateInvoiceModal, setShowGenerateInvoiceModal] = useState(false);
-  const [showInvoiceDatePicker, setShowInvoiceDatePicker] = useState(false);
   const [messageModal, setMessageModal] = useState<{ isOpen: boolean; title: string; message: string }>({
     isOpen: false,
     title: '',
@@ -161,18 +433,102 @@ const AdminOrders: React.FC = () => {
   });
   const [newInvoice, setNewInvoice] = useState({
     customerName: '',
-    date: null as DayObject | null,
+    date: null as DayValue | null,
     status: 'pending_payment' as Order['status'],
     items: [{ title: '', quantity: 1, price: '' }],
   });
+  const [itemsPerPage, setItemsPerPage] = useState<number>(5);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [goToPageInput, setGoToPageInput] = useState<string>('');
+  const [showScrollToTop, setShowScrollToTop] = useState<boolean>(false);
+  const [sortConfig, setSortConfig] = useState<{ key: keyof Order | null; direction: 'asc' | 'desc' }>({
+    key: null,
+    direction: 'asc'
+  });
+
+  const { isSidebarOpen } = useOutletContext<{ isSidebarOpen: boolean }>();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollToTop(true);
+      } else {
+        setShowScrollToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const showMessage = (title: string, message: string) => {
     setMessageModal({ isOpen: true, title, message });
   };
 
-  const formatDate = (date: DayObject | null): string => {
-    if (!date) return '';
+  const formatDate = (date: DayValue | null): string => {
+    if (!date || !date.year || !date.month || !date.day) return '';
     return `${date.year}/${String(date.month).padStart(2, '0')}/${String(date.day).padStart(2, '0')}`;
+  };
+
+  const parseDate = (dateString: string): DayValue => {
+    const [year, month, day] = dateString.split('/').map(Number);
+    if (year < 1300 || year > 1500) {
+      console.warn(`سال ${year} خارج از محدوده است، به حداقل (1300) تنظیم شد.`);
+      return { year: 1300, month: 1, day: 1 };
+    }
+    return { year, month, day };
+  };
+
+  const convertTotalToNumber = (totalString: string): number => {
+    const numericString = totalString.replace(/[^۰-۹0-9]/g, '')
+      .replace(/[۰-۹]/g, d => String.fromCharCode(d.charCodeAt(0) - '۰'.charCodeAt(0) + '0'.charCodeAt(0)));
+    return parseInt(numericString, 10);
+  };
+
+  const sortOrders = (orders: Order[]) => {
+    if (!sortConfig.key) return orders;
+
+    const sortedOrders = [...orders];
+    sortedOrders.sort((a, b) => {
+      if (sortConfig.key === 'total') {
+        const totalA = convertTotalToNumber(a.total);
+        const totalB = convertTotalToNumber(b.total);
+        return sortConfig.direction === 'asc' ? totalA - totalB : totalB - totalA;
+      }
+
+      if (sortConfig.key === 'date') {
+        const dateA = new Date(a.date.split('/').reverse().join('-'));
+        const dateB = new Date(b.date.split('/').reverse().join('-'));
+        return sortConfig.direction === 'asc'
+          ? dateA.getTime() - dateB.getTime()
+          : dateB.getTime() - dateA.getTime();
+      }
+
+      const aValue = a[sortConfig.key!];
+      const bValue = b[sortConfig.key!];
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue, 'fa')
+          : bValue.localeCompare(aValue, 'fa');
+      }
+
+      return 0;
+    });
+
+    return sortedOrders;
+  };
+
+  const handleSort = (key: keyof Order) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+    setCurrentPage(1);
   };
 
   const filteredOrders = orders.filter(order => {
@@ -182,6 +538,73 @@ const AdminOrders: React.FC = () => {
     const matchesStatus = !selectedStatus || order.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
+
+  const sortedOrders = sortOrders(filteredOrders);
+  const totalPages = Math.ceil(sortedOrders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedOrders.length);
+  const currentOrders = sortedOrders.slice(startIndex, endIndex);
+
+  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newItemsPerPage = parseInt(e.target.value);
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleGoToPage = () => {
+    const page = parseInt(goToPageInput);
+    if (!isNaN(page) && page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      setGoToPageInput('');
+    } else {
+      showMessage('خطا', 'لطفاً یک شماره صفحه معتبر وارد کنید');
+    }
+  };
+
+  const getPageNumbers = () => {
+    const maxPagesToShow = 5;
+    const pages: (number | string)[] = [];
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    if (startPage > 1) {
+      pages.push(1);
+      if (startPage > 2) pages.push('...');
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) pages.push('...');
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
 
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order);
@@ -249,17 +672,17 @@ const AdminOrders: React.FC = () => {
   const getStatusBadgeClass = (status: Order['status']): string => {
     switch (status) {
       case 'pending_payment':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
       case 'processing':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
       case 'shipped':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
       case 'delivered':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
@@ -280,159 +703,312 @@ const AdminOrders: React.FC = () => {
     }
   };
 
+  const modalOpen = showOrderDetails || showGenerateInvoiceModal || messageModal.isOpen || isSidebarOpen;
+  const datePickerClass = modalOpen ? "opacity-50 pointer-events-none" : "";
+
   return (
     <>
       <Helmet>
         <title>مدیریت سفارشات | کتاب‌خانه</title>
       </Helmet>
 
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">مدیریت سفارشات</h1>
-          <button 
-            onClick={handleGenerateInvoice}
-            className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-          >
-            <Plus className="h-5 w-5" />
-            ایجاد فاکتور جدید
-          </button>
-        </div>
+      <style>
+        {`
+          .DatePicker__calendarContainer {
+            background-color: var(--dp-background, #fff);
+            color: var(--dp-text, #212121);
+            z-index: 20;
+            max-height: 300px;
+            overflow-y: auto;
+          }
+          .DatePicker__calendarContainer .Calendar__day.-selected {
+            background-color: var(--dp-primary, #1e88e5);
+            color: #fff;
+          }
+          :root.dark {
+            --dp-background: #1f2937;
+            --dp-text: #e5e7eb;
+            --dp-primary: #3b82f6;
+          }
+          .DatePicker__input {
+            background-color: var(--dp-input-bg, #fff);
+            color: var(--dp-input-text, #212121);
+            border-color: var(--dp-input-border, #d1d5db);
+          }
+          :root.dark .DatePicker__input {
+            --dp-input-bg: #374151;
+            --dp-input-text: #e5e7eb;
+            --dp-input-border: #4b5563;
+          }
+        `}
+      </style>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
-              <Search className="absolute right-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="جستجو در سفارشات..."
-                className="w-full pr-10 py-2 px-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full py-2 px-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      <div className={modalOpen ? "opacity-50 pointer-events-none" : ""}>
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">مدیریت سفارشات</h1>
+            <button 
+              onClick={handleGenerateInvoice}
+              className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
             >
-              <option value="">همه وضعیت‌ها</option>
-              <option value="pending_payment">در انتظار پرداخت</option>
-              <option value="processing">در حال پردازش</option>
-              <option value="shipped">ارسال شده</option>
-              <option value="delivered">تحویل شده</option>
-              <option value="cancelled">لغو شده</option>
-            </select>
-            <div className="relative">
-              <div 
-                className="w-full py-2 px-4 border rounded-lg flex items-center justify-between cursor-pointer hover:border-blue-500"
-                onClick={() => setShowStartDatePicker(true)}
-              >
-                <span className={startDate ? 'text-gray-900' : 'text-gray-500'}>
-                  {startDate ? formatDate(startDate) : 'از تاریخ'}
-                </span>
-                <Calendar className="h-5 w-5 text-gray-400" />
+              <Plus className="h-5 w-5" />
+              ایجاد فاکتور جدید
+            </button>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Search className="absolute right-3 top-3 text-gray-400 dark:text-gray-300" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="جستجو در سفارشات..."
+                  className="w-full pr-10 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
               </div>
-              {showStartDatePicker && (
-                <div className="absolute top-full right-0 mt-1 z-50">
-                  <DatePicker
-                    value={startDate}
-                    onChange={date => {
-                      setStartDate(date);
-                      setShowStartDatePicker(false);
-                    }}
-                    locale="fa"
-                    shouldHighlightWeekends
-                    inputPlaceholder="انتخاب تاریخ"
-                  />
-                </div>
-              )}
-            </div>
-            <div className="relative">
-              <div 
-                className="w-full py-2 px-4 border rounded-lg flex items-center justify-between cursor-pointer hover:border-blue-500"
-                onClick={() => setShowEndDatePicker(true)}
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <span className={endDate ? 'text-gray-900' : 'text-gray-500'}>
-                  {endDate ? formatDate(endDate) : 'تا تاریخ'}
-                </span>
-                <Calendar className="h-5 w-5 text-gray-400" />
+                <option value="">همه وضعیت‌ها</option>
+                <option value="pending_payment">در انتظار پرداخت</option>
+                <option value="processing">در حال پردازش</option>
+                <option value="shipped">ارسال شده</option>
+                <option value="delivered">تحویل شده</option>
+                <option value="cancelled">لغو شده</option>
+              </select>
+              <div className={datePickerClass}>
+                <DatePicker
+                  value={startDate}
+                  onChange={setStartDate}
+                  locale="fa"
+                  minimumDate={{ year: 1300, month: 1, day: 1 }}
+                  maximumDate={{ year: 1500, month: 12, day: 29 }}
+                  shouldHighlightWeekends
+                  inputPlaceholder="از تاریخ"
+                  wrapperClassName="w-full"
+                  inputClassName="w-full py-2 px-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
-              {showEndDatePicker && (
-                <div className="absolute top-full right-0 mt-1 z-50">
-                  <DatePicker
-                    value={endDate}
-                    onChange={date => {
-                      setEndDate(date);
-                      setShowEndDatePicker(false);
-                    }}
-                    locale="fa"
-                    shouldHighlightWeekends
-                    inputPlaceholder="انتخاب تاریخ"
-                  />
-                </div>
-              )}
+              <div className={datePickerClass}>
+                <DatePicker
+                  value={endDate}
+                  onChange={setEndDate}
+                  locale="fa"
+                  minimumDate={{ year: 1300, month: 1, day: 1 }}
+                  maximumDate={{ year: 1500, month: 12, day: 29 }}
+                  shouldHighlightWeekends
+                  inputPlaceholder="تا تاریخ"
+                  wrapperClassName="w-full"
+                  inputClassName="w-full py-2 px-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Orders Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="text-right py-4 px-6">شماره سفارش</th>
-                <th className="text-right py-4 px-6">مشتری</th>
-                <th className="text-right py-4 px-6">تاریخ</th>
-                <th className="text-right py-4 px-6">مبلغ کل</th>
-                <th className="text-right py-4 px-6">وضعیت</th>
-                <th className="text-right py-4 px-6">عملیات</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order.id} className="border-b hover:bg-gray-50">
-                  <td className="py-4 px-6">{order.id}</td>
-                  <td className="py-4 px-6">{order.customerName}</td>
-                  <td className="py-4 px-6">{order.date}</td>
-                  <td className="py-4 px-6">{order.total}</td>
-                  <td className="py-4 px-6">
-                    <span className={`${getStatusBadgeClass(order.status)} px-2 py-1 rounded-full text-sm`}>
-                      {getStatusText(order.status)}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleViewOrder(order)}
-                        className="text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        <Eye className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDownloadInvoice(order)}
-                        className="text-gray-600 hover:text-gray-800 transition-colors"
-                      >
-                        <Download className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </td>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
+            <table className="w-full table-fixed font-sans border-collapse min-w-[800px]">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                  <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                    <button 
+                      onClick={() => handleSort('id')} 
+                      className="flex items-center justify-center gap-1 w-full text-center"
+                    >
+                      شماره سفارش
+                      {sortConfig.key === 'id' && (
+                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                  </th>
+                  <th className="w-[20%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                    <button 
+                      onClick={() => handleSort('customerName')} 
+                      className="flex items-center justify-center gap-1 w-full text-center"
+                    >
+                      مشتری
+                      {sortConfig.key === 'customerName' && (
+                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                  </th>
+                  <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                    <button 
+                      onClick={() => handleSort('date')} 
+                      className="flex items-center justify-center gap-1 w-full text-center"
+                    >
+                      تاریخ
+                      {sortConfig.key === 'date' && (
+                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                  </th>
+                  <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                    <button 
+                      onClick={() => handleSort('total')} 
+                      className="flex items-center justify-center gap-1 w-full text-center"
+                    >
+                      مبلغ کل
+                      {sortConfig.key === 'total' && (
+                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                  </th>
+                  <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                    <button 
+                      onClick={() => handleSort('status')} 
+                      className="flex items-center justify-center gap-1 w-full text-center"
+                    >
+                      وضعیت
+                      {sortConfig.key === 'status' && (
+                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                  </th>
+                  <th className="w-[20%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                    عملیات
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {currentOrders.map((order) => (
+                  <tr key={order.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">{order.id}</td>
+                    <td className="w-[20%] py-3 px-2 text-gray-900 dark:text-white text-center truncate">{order.customerName}</td>
+                    <td className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">{order.date}</td>
+                    <td className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">{order.total}</td>
+                    <td className="w-[15%] py-3 px-2 text-center">
+                      <span className={`${getStatusBadgeClass(order.status)} px-2 py-1 rounded-full text-sm`}>
+                        {getStatusText(order.status)}
+                      </span>
+                    </td>
+                    <td className="w-[20%] py-3 px-2 text-center">
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={() => handleViewOrder(order)}
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                        >
+                          <Eye className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDownloadInvoice(order)}
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+                        >
+                          <Download className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-between items-center mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-0">
+              <div className="flex items-center gap-2">
+                <label className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
+                <select
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                  className="py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+              <span className="text-gray-900 dark:text-white">
+                نمایش {startIndex + 1}-{endIndex} از {sortedOrders.length} سفارش
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className={`p-2 rounded-lg transition-colors ${
+                    currentPage === 1
+                      ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                      : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+                <div className="flex gap-1">
+                  {getPageNumbers().map((page, index) => (
+                    <button
+                      key={index}
+                      onClick={() => typeof page === 'number' && goToPage(page)}
+                      className={`px-3 py-1 rounded-lg transition-colors ${
+                        page === currentPage
+                          ? 'bg-primary-600 text-white'
+                          : typeof page === 'number'
+                          ? 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                          : 'text-gray-500 dark:text-gray-400 cursor-default'
+                      }`}
+                      disabled={typeof page !== 'number'}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`p-2 rounded-lg transition-colors ${
+                    currentPage === totalPages
+                      ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                      : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={goToPageInput}
+                  onChange={(e) => setGoToPageInput(e.target.value)}
+                  placeholder="شماره صفحه"
+                  className="w-24 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  min="1"
+                  max={totalPages}
+                />
+                <button
+                  onClick={handleGoToPage}
+                  className="px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  برو
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {showScrollToTop && (
+            <button
+              onClick={scrollToTop}
+              className="fixed bottom-6 left-6 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-colors"
+            >
+              <ArrowUp className="h-6 w-6" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Order Details Modal */}
       {showOrderDetails && selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">جزئیات سفارش {selectedOrder.id}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">جزئیات سفارش {selectedOrder.id}</h3>
               <button
                 onClick={() => setShowOrderDetails(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
               >
                 ✕
               </button>
@@ -440,47 +1016,46 @@ const AdminOrders: React.FC = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-gray-600">نام مشتری</p>
-                  <p className="font-medium">{selectedOrder.customerName}</p>
+                  <p className="text-gray-600 dark:text-gray-300">نام مشتری</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.customerName}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">تاریخ سفارش</p>
-                  <p className="font-medium">{selectedOrder.date}</p>
+                  <p className="text-gray-600 dark:text-gray-300">تاریخ سفارش</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.date}</p>
                 </div>
               </div>
               <div>
-                <p className="text-gray-600 mb-2">اقلام سفارش</p>
-                <div className="border rounded-lg overflow-hidden">
+                <p className="text-gray-600 dark:text-gray-300 mb-2">اقلام سفارش</p>
+                <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-gray-50 border-b">
-                        <th className="text-right py-2 px-4">عنوان</th>
-                        <th className="text-right py-2 px-4">تعداد</th>
-                        <th className="text-right py-2 px-4">قیمت</th>
+                      <tr className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                        <th className="text-right py-2 px-4 text-gray-900 dark:text-white">عنوان</th>
+                        <th className="text-right py-2 px-4 text-gray-900 dark:text-white">تعداد</th>
+                        <th className="text-right py-2 px-4 text-gray-900 dark:text-white">قیمت</th>
                       </tr>
                     </thead>
                     <tbody>
                       {selectedOrder.items.map((item, index) => (
-                        <tr key={index} className="border-b last:border-b-0">
-                          <td className="py-2 px-4">{item.title}</td>
-                          <td className="py-2 px-4">{item.quantity}</td>
-                          <td className="py-2 px-4">{item.price}</td>
+                        <tr key={index} className="border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+                          <td className="py-2 px-4 text-gray-900 dark:text-white">{item.title}</td>
+                          <td className="py-2 px-4 text-gray-900 dark:text-white">{item.quantity}</td>
+                          <td className="py-2 px-4 text-gray-900 dark:text-white">{item.price}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               </div>
-              <div className="flex justify-between items-center pt-4 border-t">
-                <span className="text-gray-600">مبلغ کل</span>
-                <span className="font-bold text-lg">{selectedOrder.total}</span>
+              <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
+                <span className="text-gray-600 dark:text-gray-300">مبلغ کل</span>
+                <span className="font-bold text-lg text-gray-900 dark:text-white">{selectedOrder.total}</span>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Generate Invoice Modal */}
       <CustomModal
         isOpen={showGenerateInvoiceModal}
         onClose={() => setShowGenerateInvoiceModal(false)}
@@ -496,37 +1071,24 @@ const AdminOrders: React.FC = () => {
             value={newInvoice.customerName}
             onChange={(e) => setNewInvoice({ ...newInvoice, customerName: e.target.value })}
             placeholder="نام مشتری"
-            className="w-full p-2 border rounded-lg"
+            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
-          <div className="relative">
-            <div 
-              className="w-full py-2 px-4 border rounded-lg flex items-center justify-between cursor-pointer hover:border-blue-500"
-              onClick={() => setShowInvoiceDatePicker(true)}
-            >
-              <span className={newInvoice.date ? 'text-gray-900' : 'text-gray-500'}>
-                {newInvoice.date ? formatDate(newInvoice.date) : 'انتخاب تاریخ'}
-              </span>
-              <Calendar className="h-5 w-5 text-gray-400" />
-            </div>
-            {showInvoiceDatePicker && (
-              <div className="absolute top-full right-0 mt-1 z-50">
-                <DatePicker
-                  value={newInvoice.date}
-                  onChange={date => {
-                    setNewInvoice({ ...newInvoice, date });
-                    setShowInvoiceDatePicker(false);
-                  }}
-                  locale="fa"
-                  shouldHighlightWeekends
-                  inputPlaceholder="انتخاب تاریخ"
-                />
-              </div>
-            )}
-          </div>
+          <DatePicker
+            value={newInvoice.date}
+            onChange={(date) => setNewInvoice({ ...newInvoice, date })}
+            locale="fa"
+            minimumDate={{ year: 1300, month: 1, day: 1 }}
+            maximumDate={{ year: 1500, month: 12, day: 29 }}
+            shouldHighlightWeekends
+            inputPlaceholder="انتخاب تاریخ"
+            wrapperClassName="w-full"
+            inputClassName="w-full py-2 px-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            disabled={showOrderDetails || messageModal.isOpen}
+          />
           <select
             value={newInvoice.status}
             onChange={(e) => setNewInvoice({ ...newInvoice, status: e.target.value as Order['status'] })}
-            className="w-full p-2 border rounded-lg"
+            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
             <option value="pending_payment">در انتظار پرداخت</option>
             <option value="processing">در حال پردازش</option>
@@ -535,7 +1097,7 @@ const AdminOrders: React.FC = () => {
             <option value="cancelled">لغو شده</option>
           </select>
           <div>
-            <p className="text-gray-600 mb-2">اقلام فاکتور</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-2">اقلام فاکتور</p>
             {newInvoice.items.map((item, index) => (
               <div key={index} className="flex gap-2 mb-2">
                 <input
@@ -543,7 +1105,7 @@ const AdminOrders: React.FC = () => {
                   value={item.title}
                   onChange={(e) => updateItemField(index, 'title', e.target.value)}
                   placeholder="عنوان"
-                  className="w-1/3 p-2 border rounded-lg"
+                  className="w-1/3 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
                 <input
                   type="number"
@@ -551,23 +1113,23 @@ const AdminOrders: React.FC = () => {
                   onChange={(e) => updateItemField(index, 'quantity', parseInt(e.target.value) || 1)}
                   min="1"
                   placeholder="تعداد"
-                  className="w-1/3 p-2 border rounded-lg"
+                  className="w-1/3 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
                 <input
                   type="text"
                   value={item.price}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, ''); // Only allow numbers
+                    const value = e.target.value.replace(/[^0-9]/g, '');
                     updateItemField(index, 'price', value);
                   }}
                   placeholder="قیمت (فقط عدد)"
-                  className="w-1/3 p-2 border rounded-lg"
+                  className="w-1/3 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             ))}
             <button
               onClick={addItemField}
-              className="text-blue-600 hover:text-blue-800"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
               + افزودن قلم دیگر
             </button>
@@ -575,7 +1137,6 @@ const AdminOrders: React.FC = () => {
         </div>
       </CustomModal>
 
-      {/* Message Modal */}
       <CustomModal
         isOpen={messageModal.isOpen}
         onClose={() => setMessageModal({ isOpen: false, title: '', message: '' })}
