@@ -1,202 +1,187 @@
-import React, { useState } from 'react';
-import { Heart, ShoppingCart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { motion } from 'framer-motion';
+import { Star, BookOpen, Download, ShoppingCart, ChevronLeft } from 'lucide-react';
+import { useCart } from '../context/CartContext';
+import { Book } from '../types';
 
-interface BookDetails {
-  id: string;
-  title: string;
-  author: string;
-  price: number;
-  images: string[];
-  description: string;
-  publisher: string;
-  publishDate: string;
-  pages: number;
-  isbn: string;
-  language: string;
+interface BookDetailsProps {
+  books: Book[];
 }
 
-const BookDetails = () => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [isAddedToCart, setIsAddedToCart] = useState(false);
+const BookDetails: React.FC<BookDetailsProps> = ({ books }) => {
+  const { id } = useParams<{ id: string }>();
+  const { addToCart } = useCart();
 
-  // Example book data (replace with your actual data)
-  const bookData: BookDetails = {
-    id: "1",
-    title: "هری پاتر و سنگ جادو",
-    author: "جی.کی. رولینگ",
-    price: 150000,
-    images: [
-      "https://images.unsplash.com/photo-1600189261867-30e5ffe7b8da?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1629992101753-56d196c8aabb?auto=format&fit=crop&q=80&w=500"
-    ],
-    description: "هری پاتر که تا کنون فکر می‌کرد یک پسر معمولی است، در یازدهمین سالگرد تولدش متوجه می‌شود که یک جادوگر است. او به مدرسه جادوگری هاگوارتز دعوت می‌شود و در آنجا با دوستان و دشمنان جدیدی آشنا می‌شود...",
-    publisher: "انتشارات کتابسرا",
-    publishDate: "1400/03/15",
-    pages: 350,
-    isbn: "978-964-8675-42-1",
-    language: "فارسی"
-  };
+  const book = books.find((b) => b.id === Number(id));
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === bookData.images.length - 1 ? 0 : prev + 1
+  if (!book) {
+    return (
+      <div className="py-16 text-center text-gray-500 dark:text-gray-400">
+        <p>کتاب مورد نظر یافت نشد.</p>
+      </div>
     );
-  };
+  }
 
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? bookData.images.length - 1 : prev - 1
-    );
-  };
-
-  const handleAddToCart = () => {
-    setIsAddedToCart(true);
-    setTimeout(() => setIsAddedToCart(false), 2000);
-  };
+  // فیلتر کردن کتاب‌های مشابه (کتاب‌هایی که در همان دسته‌بندی هستند، به جز کتاب فعلی)
+  const similarBooks = books
+    .filter((b) => b.category === book.category && b.id !== book.id)
+    .slice(0, 4); // محدود کردن به 4 کتاب مشابه
 
   return (
     <>
       <Helmet>
-        <title>{bookData.title} | کتاب‌خانه</title>
-        <meta name="description" content={bookData.description} />
+        <title>{book.title} | کتاب‌خانه</title>
+        <meta name="description" content={book.description || 'جزئیات کتاب'} />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        {/* Breadcrumb */}
+        <nav className="flex items-center mb-6 text-sm text-gray-500 dark:text-gray-400">
+          <Link to="/" className="text-primary-600 dark:text-primary-400 hover:underline">
+            صفحه اصلی
+          </Link>
+          <ChevronLeft className="w-4 h-4 mx-2" />
+          <Link to="/books" className="text-primary-600 dark:text-primary-400 hover:underline">
+            کتاب‌ها
+          </Link>
+          <ChevronLeft className="w-4 h-4 mx-2" />
+          <span>{book.title}</span>
+        </nav>
+
+        {/* جزئیات کتاب */}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="flex flex-col md:flex-row">
-              {/* Image Gallery */}
-              <div className="md:w-1/2">
-                <div className="relative aspect-[4/3]">
-                  <img
-                    src={bookData.images[currentImageIndex]}
-                    alt={bookData.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-between p-4">
-                    <button
-                      onClick={prevImage}
-                      className="bg-white/80 dark:bg-gray-800/80 p-2 rounded-full text-gray-800 dark:text-white hover:bg-white dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <button
-                      onClick={nextImage}
-                      className="bg-white/80 dark:bg-gray-800/80 p-2 rounded-full text-gray-800 dark:text-white hover:bg-white dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <ChevronRight className="w-6 h-6" />
-                    </button>
-                  </div>
-                </div>
-                <div className="flex gap-2 p-4 overflow-x-auto">
-                  {bookData.images.map((img, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden ${
-                        index === currentImageIndex ? 'ring-2 ring-primary-500' : ''
-                      }`}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
+            <img
+              src={book.image}
+              alt={book.title}
+              className="object-cover w-full rounded-lg shadow-lg h-96"
+              loading="lazy"
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col justify-between"
+          >
+            <div>
+              <h1 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">{book.title}</h1>
+              <p className="mb-2 text-gray-600 dark:text-gray-300">نویسنده: {book.author}</p>
+              <div className="flex items-center mb-4">
+                <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                <span className="mr-1 text-gray-600 dark:text-gray-300">{book.rating}</span>
               </div>
-
-              {/* Book Details */}
-              <div className="md:w-1/2 p-6 md:p-8">
-                <div className="flex justify-between items-start">
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{bookData.title}</h1>
-                  <div className="flex gap-4">
-                    <button className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                      <Share2 className="w-6 h-6" />
-                    </button>
-                    <button className="text-gray-400 hover:text-red-500">
-                      <Heart className="w-6 h-6" />
-                    </button>
-                  </div>
-                </div>
-                
-                <p className="mt-2 text-xl text-gray-600 dark:text-gray-300">{bookData.author}</p>
-                
-                <div className="mt-8">
-                  <p className="text-3xl md:text-4xl font-bold text-primary-600 dark:text-primary-400">
-                    {bookData.price.toLocaleString()} تومان
-                  </p>
-                </div>
-
-                <div className="mt-8 space-y-6">
-                  <div className="flex items-center gap-4">
-                    <label className="text-gray-700 dark:text-gray-300">تعداد:</label>
-                    <div className="flex items-center border dark:border-gray-600 rounded-lg">
-                      <button
-                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                        className="px-3 py-1 border-l dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        -
-                      </button>
-                      <span className="px-4 text-gray-900 dark:text-white">{quantity}</span>
-                      <button
-                        onClick={() => setQuantity(q => q + 1)}
-                        className="px-3 py-1 border-r dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleAddToCart}
-                    className={`w-full flex items-center justify-center gap-2 px-8 py-4 rounded-lg text-white font-medium transition-colors ${
-                      isAddedToCart
-                        ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700'
-                        : 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600'
-                    }`}
-                  >
-                    <ShoppingCart className="w-5 h-5" />
-                    {isAddedToCart ? 'به سبد خرید اضافه شد' : 'افزودن به سبد خرید'}
-                  </button>
-                </div>
-
-                <div className="mt-8">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">درباره کتاب</h2>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{bookData.description}</p>
-                </div>
-
-                <div className="mt-8 grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">ناشر</h3>
-                    <p className="text-gray-600 dark:text-gray-300">{bookData.publisher}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">تاریخ انتشار</h3>
-                    <p className="text-gray-600 dark:text-gray-300">{bookData.publishDate}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">تعداد صفحات</h3>
-                    <p className="text-gray-600 dark:text-gray-300">{bookData.pages}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">شابک</h3>
-                    <p className="text-gray-600 dark:text-gray-300">{bookData.isbn}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900 dark:text-white">زبان</h3>
-                    <p className="text-gray-600 dark:text-gray-300">{bookData.language}</p>
-                  </div>
-                </div>
+              <p className="mb-4 text-gray-500 dark:text-gray-400">{book.description || 'توضیحات در دسترس نیست.'}</p>
+              <p className="mb-4 text-gray-600 dark:text-gray-300">دسته‌بندی: {book.category}</p>
+              <div className="flex mb-4 space-x-2 rtl:space-x-reverse">
+                {(book.format === 'ebook' || book.format === 'both') && (
+                  <span className="flex items-center px-3 py-1 text-sm text-white rounded-md bg-primary-500">
+                    <Download className="w-4 h-4 ml-1" />
+                    الکترونیک
+                  </span>
+                )}
+                {(book.format === 'print' || book.format === 'both') && (
+                  <span className="flex items-center px-3 py-1 text-sm text-white bg-gray-700 rounded-md">
+                    <BookOpen className="w-4 h-4 ml-1" />
+                    چاپی
+                  </span>
+                )}
               </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                {book.price.toLocaleString('fa-IR')} تومان
+              </span>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => addToCart({ ...book, quantity: 1 })}
+                className="flex items-center justify-center gap-2 px-6 py-3 text-white transition-colors rounded-md bg-primary-600 hover:bg-primary-700"
+                aria-label={`افزودن ${book.title} به سبد خرید`}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                افزودن به سبد خرید
+              </motion.button>
             </div>
           </motion.div>
         </div>
+
+        {/* کتاب‌های مشابه */}
+        {similarBooks.length > 0 && (
+          <div className="mt-12">
+            <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">کتاب‌های مشابه</h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {similarBooks.map((similarBook) => (
+                <motion.div
+                  key={similarBook.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}
+                  className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden relative min-h-[400px]"
+                >
+                  <Link to={`/books/${similarBook.id}`} aria-label={`مشاهده کتاب ${similarBook.title}`}>
+                    <div className="relative">
+                      <img
+                        src={similarBook.image}
+                        alt={similarBook.title}
+                        className="object-cover w-full h-48"
+                        loading="lazy"
+                      />
+                      <div className="absolute flex space-x-2 top-2 left-2 rtl:space-x-reverse">
+                        {(similarBook.format === 'ebook' || similarBook.format === 'both') && (
+                          <span className="flex items-center px-2 py-1 text-sm text-white rounded-md bg-primary-500">
+                            <Download className="w-4 h-4 ml-1" />
+                            الکترونیک
+                          </span>
+                        )}
+                        {(similarBook.format === 'print' || similarBook.format === 'both') && (
+                          <span className="flex items-center px-2 py-1 text-sm text-white bg-gray-700 rounded-md">
+                            <BookOpen className="w-4 h-4 ml-1" />
+                            چاپی
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-4 flex flex-col h-[200px]">
+                      <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                        {similarBook.title}
+                      </h3>
+                      <p className="mb-2 text-gray-600 dark:text-gray-300">{similarBook.author}</p>
+                      <p className="flex-1 mb-4 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                        {similarBook.description || 'توضیحات در دسترس نیست.'}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-primary-600 dark:text-primary-400">
+                          {similarBook.price.toLocaleString('fa-IR')} تومان
+                        </span>
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <span className="mr-1 text-gray-600 dark:text-gray-300">{similarBook.rating}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => addToCart({ ...similarBook, quantity: 1 })}
+                    className="absolute flex items-center justify-center gap-2 py-2 text-white transition-colors rounded-md bottom-4 left-4 right-4 bg-primary-600 hover:bg-primary-700"
+                    aria-label={`افزودن ${similarBook.title} به سبد خرید`}
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    افزودن به سبد خرید
+                  </motion.button>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

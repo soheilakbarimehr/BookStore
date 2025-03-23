@@ -1,20 +1,20 @@
 export interface Book {
-  id: string;
+  id: number;
   title: string;
   author: string;
-  description: string;
   price: number;
-  coverImage: string;
-  format: 'ebook' | 'print' | 'both';
-  category: string;
+  image: string;
   rating: number;
-  inStock: boolean;
-  publishDate: string;
+  category: string;
+  description?: string;
+  format?: 'print' | 'ebook' | 'both';
 }
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
+export interface CartItem {
+  id: number;
+  title: string;
+  author: string;
+  price: number;
+  image: string;
+  quantity: number;
 }

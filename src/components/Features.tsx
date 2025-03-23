@@ -1,4 +1,4 @@
-// Features.tsx
+// src/components/Features.tsx
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Truck, CreditCard, Headphones } from 'lucide-react';
@@ -14,7 +14,6 @@ interface FeaturesProps {
   lang: 'fa' | 'en';
 }
 
-// کامپوننت ویژگی‌ها
 const Features: React.FC<FeaturesProps> = ({ features, lang }) => {
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-3">

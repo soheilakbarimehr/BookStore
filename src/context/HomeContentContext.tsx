@@ -1,105 +1,107 @@
 // src/context/HomeContentContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// تایپ اسلایدها
-interface Slide {
+interface SliderItem {
   id: number;
-  title: { fa: string; en: string };
-  description: { fa: string; en: string };
   image: string;
+  title: string;
+  description: string;
   buttonLink: string;
 }
 
-// تایپ ویژگی‌ها
 interface Feature {
-  title: { fa: string; en: string };
-  description: { fa: string; en: string };
   icon: 'Truck' | 'CreditCard' | 'Headphones';
+  title: string;
+  description: string;
 }
 
-// تایپ بخش‌ها
 interface Section {
   id: number;
-  title: { fa: string; en: string };
-  type: 'featured-books' | 'latest-books' | 'features' | 'custom';
-  content: string[] | Feature[] | string;
+  title: string;
+  type: 'featured-books' | 'categories' | 'custom' | 'features';
+  content: string | string[] | Feature[];
   visible: boolean;
 }
 
 interface HomeContent {
-  slider: Slide[];
+  slider: SliderItem[];
   sections: Section[];
 }
 
-const HomeContentContext = createContext<
-  | {
-      homeContent: HomeContent;
-      setHomeContent: React.Dispatch<React.SetStateAction<HomeContent>>;
-    }
-  | undefined
->(undefined);
+interface HomeContentContextType {
+  homeContent: HomeContent;
+  updateSlider: (slider: SliderItem[]) => void;
+  updateSections: (sections: Section[]) => void;
+}
 
-export const HomeContentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [homeContent, setHomeContent] = useState<HomeContent>({
-    slider: [
-      {
-        id: 1,
-        title: { fa: 'خوش آمدید به کتاب‌خانه', en: 'Welcome to Bookstore' },
-        description: { fa: 'بهترین کتاب‌ها را با بهترین قیمت پیدا کنید', en: 'Find the best books at the best prices' },
-        image: 'slide1.jpg',
-        buttonLink: '/shop',
-      },
-      {
-        id: 2,
-        title: { fa: 'تخفیف ویژه این هفته', en: 'This Week’s Special Discount' },
-        description: { fa: 'تا 50% تخفیف برای کتاب‌های منتخب', en: 'Up to 50% off on selected books' },
-        image: 'slide2.jpg',
-        buttonLink: '/shop/discounts',
-      },
-    ],
-    sections: [
-      {
-        id: 1,
-        title: { fa: 'ویژگی‌های ما', en: 'Our Features' },
-        type: 'features',
-        content: [
-          {
-            title: { fa: 'ارسال سریع', en: 'Fast Delivery' },
-            description: { fa: 'ارسال در کمتر از 24 ساعت', en: 'Delivery in less than 24 hours' },
-            icon: 'Truck',
-          },
-          {
-            title: { fa: 'پرداخت امن', en: 'Secure Payment' },
-            description: { fa: 'پرداخت با درگاه امن', en: 'Pay with a secure gateway' },
-            icon: 'CreditCard',
-          },
-          {
-            title: { fa: 'پشتیبانی 24/7', en: '24/7 Support' },
-            description: { fa: 'پشتیبانی شبانه‌روزی', en: 'Round-the-clock support' },
-            icon: 'Headphones',
-          },
-        ],
-        visible: true,
-      },
-      {
-        id: 2,
-        title: { fa: 'کتاب‌های ویژه', en: 'Featured Books' },
-        type: 'featured-books',
-        content: ['1', '2', '3', '4', '5'], // آیدی کتاب‌ها برای 5 کارت
-        visible: true,
-      },
-      {
-        id: 3,
-        title: { fa: 'جدیدترین کتاب‌ها', en: 'Latest Books' },
-        type: 'latest-books',
-        content: ['6', '7', '8', '9', '10'], // آیدی کتاب‌ها برای 5 کارت
-        visible: true,
-      },
-    ],
+const HomeContentContext = createContext<HomeContentContextType | undefined>(undefined);
+
+const initialHomeContent: HomeContent = {
+  slider: [
+    {
+      id: 1,
+      image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=1200',
+      title: 'به کتاب‌خانه خوش آمدید',
+      description: 'جدیدترین کتاب‌ها را با بهترین قیمت‌ها کشف کنید!',
+      buttonLink: '/books',
+    },
+    {
+      id: 2,
+      image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1200',
+      title: 'تخفیف ویژه پاییزی',
+      description: 'تا 30% تخفیف برای کتاب‌های منتخب',
+      buttonLink: '/books',
+    },
+  ],
+  sections: [
+    {
+      id: 1,
+      title: 'کتاب‌های ویژه',
+      type: 'featured-books',
+      content: ['1', '2'],
+      visible: true,
+    },
+    {
+      id: 2,
+      title: 'دسته‌بندی‌های محبوب',
+      type: 'categories',
+      content: ['ادبیات داستانی', 'توسعه فردی'],
+      visible: true,
+    },
+    {
+      id: 3,
+      title: 'ویژگی‌ها',
+      type: 'features',
+      content: [
+        { icon: 'Truck', title: 'ارسال سریع', description: 'ارسال رایگان برای سفارش‌های بالای ۵۰۰ هزار تومان' },
+        { icon: 'CreditCard', title: 'پرداخت امن', description: 'پرداخت اینترنتی مطمئن با درگاه‌های معتبر' },
+        { icon: 'Headphones', title: 'پشتیبانی ۲۴/۷', description: 'پاسخگویی به سوالات شما در تمام ساعات' },
+      ],
+      visible: true,
+    },
+  ],
+};
+
+export const HomeContentProvider = ({ children }: { children: ReactNode }) => {
+  const [homeContent, setHomeContent] = useState<HomeContent>(() => {
+    const savedContent = localStorage.getItem('homeContent');
+    return savedContent ? JSON.parse(savedContent) : initialHomeContent;
   });
 
+  const updateSlider = (slider: SliderItem[]) => {
+    const newContent = { ...homeContent, slider };
+    setHomeContent(newContent);
+    localStorage.setItem('homeContent', JSON.stringify(newContent));
+  };
+
+  const updateSections = (sections: Section[]) => {
+    const newContent = { ...homeContent, sections };
+    setHomeContent(newContent);
+    localStorage.setItem('homeContent', JSON.stringify(newContent));
+  };
+
   return (
-    <HomeContentContext.Provider value={{ homeContent, setHomeContent }}>
+    <HomeContentContext.Provider value={{ homeContent, updateSlider, updateSections }}>
       {children}
     </HomeContentContext.Provider>
   );
