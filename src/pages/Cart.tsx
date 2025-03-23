@@ -1,3 +1,4 @@
+// src/pages/Cart.tsx
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -169,7 +170,7 @@ const Cart = () => {
                   </div>
                 </div>
                 <Link
-                  to="/checkout"
+                  to="/checkout" // اصلاح مسیر به /checkout
                   className="block w-full px-4 py-3 mt-6 text-center text-white transition-colors rounded-md bg-primary-600 hover:bg-primary-700"
                 >
                   ادامه فرآیند خرید

@@ -1,111 +1,158 @@
 // src/context/HomeContentContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface SliderItem {
+// تعریف تایپ‌ها
+interface Slide {
   id: number;
-  image: string;
   title: string;
   description: string;
+  image: string;
   buttonLink: string;
 }
 
 interface Feature {
-  icon: 'Truck' | 'CreditCard' | 'Headphones';
   title: string;
   description: string;
+  icon: 'Truck' | 'CreditCard' | 'Headphones';
 }
 
 interface Section {
   id: number;
   title: string;
-  type: 'featured-books' | 'categories' | 'custom' | 'features';
-  content: string | string[] | Feature[];
+  type: 'featured-books' | 'categories' | 'features' | 'custom' | 'latest-books';
+  content: string[] | Feature[] | string;
   visible: boolean;
 }
 
-interface HomeContent {
-  slider: SliderItem[];
+interface PageContent {
+  slider?: Slide[];
   sections: Section[];
+  customContent?: string; // برای صفحاتی مثل About که محتوای متنی دارن
+}
+
+interface ContentState {
+  pages: {
+    [key: string]: PageContent; // کلید: نام صفحه (مثل "home", "about")
+  };
 }
 
 interface HomeContentContextType {
-  homeContent: HomeContent;
-  updateSlider: (slider: SliderItem[]) => void;
-  updateSections: (sections: Section[]) => void;
+  content: ContentState;
+  updatePageContent: (page: string, newContent: PageContent) => void;
+  updateSlider: (page: string, newSlider: Slide[]) => void;
+  updateSections: (page: string, newSections: Section[]) => void;
+  updateCustomContent: (page: string, newCustomContent: string) => void;
 }
 
 const HomeContentContext = createContext<HomeContentContextType | undefined>(undefined);
 
-const initialHomeContent: HomeContent = {
-  slider: [
-    {
-      id: 1,
-      image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=1200',
-      title: 'به کتاب‌خانه خوش آمدید',
-      description: 'جدیدترین کتاب‌ها را با بهترین قیمت‌ها کشف کنید!',
-      buttonLink: '/books',
-    },
-    {
-      id: 2,
-      image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1200',
-      title: 'تخفیف ویژه پاییزی',
-      description: 'تا 30% تخفیف برای کتاب‌های منتخب',
-      buttonLink: '/books',
-    },
-  ],
-  sections: [
-    {
-      id: 1,
-      title: 'کتاب‌های ویژه',
-      type: 'featured-books',
-      content: ['1', '2'],
-      visible: true,
-    },
-    {
-      id: 2,
-      title: 'دسته‌بندی‌های محبوب',
-      type: 'categories',
-      content: ['ادبیات داستانی', 'توسعه فردی'],
-      visible: true,
-    },
-    {
-      id: 3,
-      title: 'ویژگی‌ها',
-      type: 'features',
-      content: [
-        { icon: 'Truck', title: 'ارسال سریع', description: 'ارسال رایگان برای سفارش‌های بالای ۵۰۰ هزار تومان' },
-        { icon: 'CreditCard', title: 'پرداخت امن', description: 'پرداخت اینترنتی مطمئن با درگاه‌های معتبر' },
-        { icon: 'Headphones', title: 'پشتیبانی ۲۴/۷', description: 'پاسخگویی به سوالات شما در تمام ساعات' },
+// دیتای اولیه
+const initialContent: ContentState = {
+  pages: {
+    home: {
+      slider: [
+        {
+          id: 1,
+          title: 'به کتاب‌خانه خوش آمدید',
+          description: 'بهترین کتاب‌های الکترونیکی و چاپی را با ما تجربه کنید',
+          image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=1200',
+          buttonLink: '/books',
+        },
       ],
-      visible: true,
+      sections: [
+        {
+          id: 1,
+          title: 'ویژگی‌های ما',
+          type: 'features',
+          content: [
+            { title: 'ارسال سریع', description: 'تحویل در کمتر از ۴۸ ساعت', icon: 'Truck' },
+            { title: 'پرداخت امن', description: 'پرداخت با درگاه‌های معتبر', icon: 'CreditCard' },
+            { title: 'پشتیبانی ۲۴/۷', description: 'همیشه در کنار شما هستیم', icon: 'Headphones' },
+          ],
+          visible: true,
+        },
+        {
+          id: 2,
+          title: 'کتاب‌های ویژه',
+          type: 'featured-books',
+          content: ['1', '2', '3', '4'],
+          visible: true,
+        },
+        {
+          id: 3,
+          title: 'دسته‌بندی‌ها',
+          type: 'categories',
+          content: ['ادبیات داستانی', 'علمی-تخیلی', 'تاریخی', 'روانشناسی'],
+          visible: true,
+        },
+      ],
     },
-  ],
+    about: {
+      sections: [],
+      customContent: '<h2>درباره ما</h2><p>ما یک فروشگاه آنلاین کتاب هستیم که از سال ۱۴۰۰ فعالیت خود را آغاز کرده‌ایم.</p>',
+    },
+    // می‌تونی صفحات دیگه رو هم اینجا اضافه کنی
+  },
 };
 
-export const HomeContentProvider = ({ children }: { children: ReactNode }) => {
-  const [homeContent, setHomeContent] = useState<HomeContent>(() => {
-    const savedContent = localStorage.getItem('homeContent');
-    return savedContent ? JSON.parse(savedContent) : initialHomeContent;
-  });
+export function HomeContentProvider({ children }: { children: ReactNode }) {
+  const [content, setContent] = useState<ContentState>(initialContent);
 
-  const updateSlider = (slider: SliderItem[]) => {
-    const newContent = { ...homeContent, slider };
-    setHomeContent(newContent);
-    localStorage.setItem('homeContent', JSON.stringify(newContent));
+  const updatePageContent = (page: string, newContent: PageContent) => {
+    setContent((prev) => ({
+      ...prev,
+      pages: {
+        ...prev.pages,
+        [page]: newContent,
+      },
+    }));
   };
 
-  const updateSections = (sections: Section[]) => {
-    const newContent = { ...homeContent, sections };
-    setHomeContent(newContent);
-    localStorage.setItem('homeContent', JSON.stringify(newContent));
+  const updateSlider = (page: string, newSlider: Slide[]) => {
+    setContent((prev) => ({
+      ...prev,
+      pages: {
+        ...prev.pages,
+        [page]: {
+          ...prev.pages[page],
+          slider: newSlider,
+        },
+      },
+    }));
+  };
+
+  const updateSections = (page: string, newSections: Section[]) => {
+    setContent((prev) => ({
+      ...prev,
+      pages: {
+        ...prev.pages,
+        [page]: {
+          ...prev.pages[page],
+          sections: newSections,
+        },
+      },
+    }));
+  };
+
+  const updateCustomContent = (page: string, newCustomContent: string) => {
+    setContent((prev) => ({
+      ...prev,
+      pages: {
+        ...prev.pages,
+        [page]: {
+          ...prev.pages[page],
+          customContent: newCustomContent,
+        },
+      },
+    }));
   };
 
   return (
-    <HomeContentContext.Provider value={{ homeContent, updateSlider, updateSections }}>
+    <HomeContentContext.Provider value={{ content, updatePageContent, updateSlider, updateSections, updateCustomContent }}>
       {children}
     </HomeContentContext.Provider>
   );
-};
+}
 
 export const useHomeContent = () => {
   const context = useContext(HomeContentContext);

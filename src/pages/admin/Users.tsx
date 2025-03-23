@@ -49,27 +49,27 @@ const CustomModal: React.FC<CustomModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-4">
-          <AlertCircle className="h-6 w-6" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="w-full max-w-md p-6 mx-4 bg-white rounded-lg dark:bg-gray-800">
+        <div className="flex items-center gap-3 mb-4 text-red-600 dark:text-red-400">
+          <AlertCircle className="w-6 h-6" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
         </div>
-        <div className="text-gray-600 dark:text-gray-300 mb-6">
+        <div className="mb-6 text-gray-600 dark:text-gray-300">
           {message}
           {children}
         </div>
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-600 transition-colors rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             {cancelText || 'بستن'}
           </button>
           {onConfirm && (
             <button
               onClick={onConfirm}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-4 py-2 text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700"
             >
               {confirmText || 'تایید'}
             </button>
@@ -461,106 +461,116 @@ const AdminUsers: React.FC = () => {
       </style>
 
       <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">مدیریت کاربران</h1>
           <button 
             onClick={handleAddUser}
-            className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg bg-primary-600 hover:bg-primary-700"
           >
-            <UserPlus className="h-5 w-5" />
+            <UserPlus className="w-5 h-5" />
             افزودن کاربر جدید
           </button>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 mb-6 bg-white rounded-lg shadow dark:bg-gray-800">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="relative">
-              <Search className="absolute right-3 top-3 text-gray-400 dark:text-gray-300" />
+              <label htmlFor="search-users" className="sr-only">جستجو در کاربران</label>
+              <Search className="absolute text-gray-400 right-3 top-3 dark:text-gray-300" />
               <input
+                id="search-users"
                 type="text"
                 placeholder="جستجو در کاربران..."
-                className="w-full pr-10 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 pr-10 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <select 
-              className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-            >
-              <option>همه نقش‌ها</option>
-              <option>مدیر</option>
-              <option>کاربر عادی</option>
-            </select>
-            <select 
-              className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option>همه وضعیت‌ها</option>
-              <option>فعال</option>
-              <option>غیرفعال</option>
-            </select>
+            <div className="flex items-center gap-2">
+              <label htmlFor="role-filter" className="text-gray-900 dark:text-white">فیلتر نقش:</label>
+              <select 
+                id="role-filter"
+                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+              >
+                <option>همه نقش‌ها</option>
+                <option>مدیر</option>
+                <option>کاربر عادی</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="status-filter" className="text-gray-900 dark:text-white">فیلتر وضعیت:</label>
+              <select 
+                id="status-filter"
+                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option>همه وضعیت‌ها</option>
+                <option>فعال</option>
+                <option>غیرفعال</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
+        <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800">
           <table className="w-full table-fixed font-sans border-collapse min-w-[800px]">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+              <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                 <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                   <button 
                     onClick={() => handleSort('name')} 
-                    className="flex items-center justify-center gap-1 w-full text-center"
+                    className="flex items-center justify-center w-full gap-1 text-center"
                   >
                     نام
                     {sortConfig.key === 'name' && (
-                      sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                     )}
                   </button>
                 </th>
                 <th className="w-[20%] py-3 px-2 text-gray-900 dark:text-white text-center">
                   <button 
                     onClick={() => handleSort('email')} 
-                    className="flex items-center justify-center gap-1 w-full text-center"
+                    className="flex items-center justify-center w-full gap-1 text-center"
                   >
                     ایمیل
                     {sortConfig.key === 'email' && (
-                      sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                     )}
                   </button>
                 </th>
                 <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                   <button 
                     onClick={() => handleSort('role')} 
-                    className="flex items-center justify-center gap-1 w-full text-center"
+                    className="flex items-center justify-center w-full gap-1 text-center"
                   >
                     نقش
                     {sortConfig.key === 'role' && (
-                      sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                     )}
                   </button>
                 </th>
                 <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                   <button 
                     onClick={() => handleSort('joinDate')} 
-                    className="flex items-center justify-center gap-1 w-full text-center"
+                    className="flex items-center justify-center w-full gap-1 text-center"
                   >
                     تاریخ عضویت
                     {sortConfig.key === 'joinDate' && (
-                      sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                     )}
                   </button>
                 </th>
                 <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                   <button 
                     onClick={() => handleSort('status')} 
-                    className="flex items-center justify-center gap-1 w-full text-center"
+                    className="flex items-center justify-center w-full gap-1 text-center"
                   >
                     وضعیت
                     {sortConfig.key === 'status' && (
-                      sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                     )}
                   </button>
                 </th>
@@ -586,24 +596,30 @@ const AdminUsers: React.FC = () => {
                     </span>
                   </td>
                   <td className="w-[20%] py-3 px-2 text-center">
-                    <div className="flex gap-2 justify-center">
+                    <div className="flex justify-center gap-2">
                       <button 
                         onClick={() => handleEditClick(user)}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                        aria-label={`ویرایش کاربر ${user.name}`}
+                        title={`ویرایش کاربر ${user.name}`}
+                        className="text-blue-600 transition-colors dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                       >
-                        <Edit className="h-5 w-5" />
+                        <Edit className="w-5 h-5" />
                       </button>
                       <button 
                         onClick={() => handleMailClick(user)}
-                        className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+                        aria-label={`ارسال ایمیل به ${user.name}`}
+                        title={`ارسال ایمیل به ${user.name}`}
+                        className="text-gray-600 transition-colors dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
                       >
-                        <Mail className="h-5 w-5" />
+                        <Mail className="w-5 h-5" />
                       </button>
                       <button 
                         onClick={() => handleDeleteClick(user)}
-                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                        aria-label={`حذف کاربر ${user.name}`}
+                        title={`حذف کاربر ${user.name}`}
+                        className="text-red-600 transition-colors dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                       >
-                        <Trash2 className="h-5 w-5" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
                   </td>
@@ -613,14 +629,15 @@ const AdminUsers: React.FC = () => {
           </table>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-0">
+        <div className="flex flex-col items-center justify-between p-4 mt-4 bg-white rounded-lg shadow sm:flex-row dark:bg-gray-800">
+          <div className="flex flex-col items-center gap-4 mb-4 sm:flex-row sm:mb-0">
             <div className="flex items-center gap-2">
-              <label className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
+              <label htmlFor="items-per-page" className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
               <select
+                id="items-per-page"
                 value={itemsPerPage}
                 onChange={handleItemsPerPageChange}
-                className="py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -633,18 +650,20 @@ const AdminUsers: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex flex-col items-center gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
               <button
                 onClick={goToPreviousPage}
                 disabled={currentPage === 1}
+                aria-label="صفحه قبلی"
+                title="صفحه قبلی"
                 className={`p-2 rounded-lg transition-colors ${
                   currentPage === 1
                     ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="w-5 h-5" />
               </button>
               <div className="flex gap-1">
                 {getPageNumbers().map((page, index) => (
@@ -667,28 +686,32 @@ const AdminUsers: React.FC = () => {
               <button
                 onClick={goToNextPage}
                 disabled={currentPage === totalPages}
+                aria-label="صفحه بعدی"
+                title="صفحه بعدی"
                 className={`p-2 rounded-lg transition-colors ${
                   currentPage === totalPages
                     ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
             </div>
             <div className="flex items-center gap-2">
+              <label htmlFor="go-to-page" className="sr-only">شماره صفحه</label>
               <input
+                id="go-to-page"
                 type="number"
                 value={goToPageInput}
                 onChange={(e) => setGoToPageInput(e.target.value)}
                 placeholder="شماره صفحه"
-                className="w-24 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-24 px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 min="1"
                 max={totalPages}
               />
               <button
                 onClick={handleGoToPage}
-                className="px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="px-3 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
               >
                 برو
               </button>
@@ -699,9 +722,11 @@ const AdminUsers: React.FC = () => {
         {showScrollToTop && (
           <button
             onClick={scrollToTop}
-            className="fixed bottom-6 left-6 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-colors"
+            aria-label="برو به بالای صفحه"
+            title="برو به بالای صفحه"
+            className="fixed p-3 text-white transition-colors rounded-full shadow-lg bottom-6 left-6 bg-primary-600 hover:bg-primary-700"
           >
-            <ArrowUp className="h-6 w-6" />
+            <ArrowUp className="w-6 h-6" />
           </button>
         )}
       </div>
@@ -715,49 +740,68 @@ const AdminUsers: React.FC = () => {
         confirmText="ثبت"
         cancelText="انصراف"
       >
-        <div className="space-y-4 mt-2">
-          <input
-            type="text"
-            value={newUserForm.name}
-            onChange={(e) => setNewUserForm({ ...newUserForm, name: e.target.value })}
-            placeholder="نام"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          />
-          <input
-            type="email"
-            value={newUserForm.email}
-            onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
-            placeholder="ایمیل"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          />
-          <select
-            value={newUserForm.role}
-            onChange={(e) => setNewUserForm({ ...newUserForm, role: e.target.value })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="کاربر عادی">کاربر عادی</option>
-            <option value="مدیر">مدیر</option>
-          </select>
-          <DatePicker
-            value={newUserForm.joinDate}
-            onChange={(date) => setNewUserForm({ ...newUserForm, joinDate: date })}
-            locale="fa"
-            minimumDate={{ year: 1300, month: 1, day: 1 }}
-            maximumDate={{ year: 1500, month: 12, day: 29 }}
-            shouldHighlightWeekends
-            wrapperClassName="w-full"
-            inputClassName="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            inputPlaceholder="تاریخ عضویت را انتخاب کنید"
-            calendarClassName="react-calendar"
-          />
-          <select
-            value={newUserForm.status}
-            onChange={(e) => setNewUserForm({ ...newUserForm, status: e.target.value })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="فعال">فعال</option>
-            <option value="غیرفعال">غیرفعال</option>
-          </select>
+        <div className="mt-2 space-y-4">
+          <div className="flex items-center gap-2">
+            <label htmlFor="new-user-name" className="text-gray-600 dark:text-gray-300">نام:</label>
+            <input
+              id="new-user-name"
+              type="text"
+              value={newUserForm.name}
+              onChange={(e) => setNewUserForm({ ...newUserForm, name: e.target.value })}
+              placeholder="نام"
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="new-user-email" className="text-gray-600 dark:text-gray-300">ایمیل:</label>
+            <input
+              id="new-user-email"
+              type="email"
+              value={newUserForm.email}
+              onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
+              placeholder="ایمیل"
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="new-user-role" className="text-gray-600 dark:text-gray-300">نقش:</label>
+            <select
+              id="new-user-role"
+              value={newUserForm.role}
+              onChange={(e) => setNewUserForm({ ...newUserForm, role: e.target.value })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="کاربر عادی">کاربر عادی</option>
+              <option value="مدیر">مدیر</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="new-user-join-date" className="text-gray-600 dark:text-gray-300">تاریخ عضویت:</label>
+            <DatePicker
+              value={newUserForm.joinDate}
+              onChange={(date) => setNewUserForm({ ...newUserForm, joinDate: date })}
+              locale="fa"
+              minimumDate={{ year: 1300, month: 1, day: 1 }}
+              maximumDate={{ year: 1500, month: 12, day: 29 }}
+              shouldHighlightWeekends
+              wrapperClassName="w-full"
+              inputClassName="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              inputPlaceholder="تاریخ عضویت را انتخاب کنید"
+              calendarClassName="react-calendar"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="new-user-status" className="text-gray-600 dark:text-gray-300">وضعیت:</label>
+            <select
+              id="new-user-status"
+              value={newUserForm.status}
+              onChange={(e) => setNewUserForm({ ...newUserForm, status: e.target.value })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="فعال">فعال</option>
+              <option value="غیرفعال">غیرفعال</option>
+            </select>
+          </div>
         </div>
       </CustomModal>
 
@@ -780,49 +824,68 @@ const AdminUsers: React.FC = () => {
         confirmText="ثبت"
         cancelText="انصراف"
       >
-        <div className="space-y-4 mt-2">
-          <input
-            type="text"
-            value={editUserForm.name}
-            onChange={(e) => setEditUserForm({ ...editUserForm, name: e.target.value })}
-            placeholder="نام"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          />
-          <input
-            type="email"
-            value={editUserForm.email}
-            onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
-            placeholder="ایمیل"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          />
-          <select
-            value={editUserForm.role}
-            onChange={(e) => setEditUserForm({ ...editUserForm, role: e.target.value })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="کاربر عادی">کاربر عادی</option>
-            <option value="مدیر">مدیر</option>
-          </select>
-          <DatePicker
-            value={editUserForm.joinDate}
-            onChange={(date) => setEditUserForm({ ...editUserForm, joinDate: date })}
-            locale="fa"
-            minimumDate={{ year: 1300, month: 1, day: 1 }}
-            maximumDate={{ year: 1500, month: 12, day: 29 }}
-            shouldHighlightWeekends
-            wrapperClassName="w-full"
-            inputClassName="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            inputPlaceholder="تاریخ عضویت را انتخاب کنید"
-            calendarClassName="react-calendar"
-          />
-          <select
-            value={editUserForm.status}
-            onChange={(e) => setEditUserForm({ ...editUserForm, status: e.target.value })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="فعال">فعال</option>
-            <option value="غیرفعال">غیرفعال</option>
-          </select>
+        <div className="mt-2 space-y-4">
+          <div className="flex items-center gap-2">
+            <label htmlFor="edit-user-name" className="text-gray-600 dark:text-gray-300">نام:</label>
+            <input
+              id="edit-user-name"
+              type="text"
+              value={editUserForm.name}
+              onChange={(e) => setEditUserForm({ ...editUserForm, name: e.target.value })}
+              placeholder="نام"
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="edit-user-email" className="text-gray-600 dark:text-gray-300">ایمیل:</label>
+            <input
+              id="edit-user-email"
+              type="email"
+              value={editUserForm.email}
+              onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
+              placeholder="ایمیل"
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="edit-user-role" className="text-gray-600 dark:text-gray-300">نقش:</label>
+            <select
+              id="edit-user-role"
+              value={editUserForm.role}
+              onChange={(e) => setEditUserForm({ ...editUserForm, role: e.target.value })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="کاربر عادی">کاربر عادی</option>
+              <option value="مدیر">مدیر</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="edit-user-join-date" className="text-gray-600 dark:text-gray-300">تاریخ عضویت:</label>
+            <DatePicker
+              value={editUserForm.joinDate}
+              onChange={(date) => setEditUserForm({ ...editUserForm, joinDate: date })}
+              locale="fa"
+              minimumDate={{ year: 1300, month: 1, day: 1 }}
+              maximumDate={{ year: 1500, month: 12, day: 29 }}
+              shouldHighlightWeekends
+              wrapperClassName="w-full"
+              inputClassName="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              inputPlaceholder="تاریخ عضویت را انتخاب کنید"
+              calendarClassName="react-calendar"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="edit-user-status" className="text-gray-600 dark:text-gray-300">وضعیت:</label>
+            <select
+              id="edit-user-status"
+              value={editUserForm.status}
+              onChange={(e) => setEditUserForm({ ...editUserForm, status: e.target.value })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="فعال">فعال</option>
+              <option value="غیرفعال">غیرفعال</option>
+            </select>
+          </div>
         </div>
       </CustomModal>
 
@@ -835,12 +898,16 @@ const AdminUsers: React.FC = () => {
         confirmText="ارسال"
         cancelText="انصراف"
       >
-        <textarea
-          value={mailMessage}
-          onChange={(e) => setMailMessage(e.target.value)}
-          className="w-full mt-2 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          rows={4}
-        />
+        <div className="flex flex-col gap-2">
+          <label htmlFor="mail-message" className="text-gray-600 dark:text-gray-300">پیام:</label>
+          <textarea
+            id="mail-message"
+            value={mailMessage}
+            onChange={(e) => setMailMessage(e.target.value)}
+            className="w-full p-2 mt-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            rows={4}
+          />
+        </div>
       </CustomModal>
 
       <CustomModal

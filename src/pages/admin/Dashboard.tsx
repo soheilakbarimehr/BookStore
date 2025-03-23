@@ -253,52 +253,52 @@ const Dashboard = () => {
       </Helmet>
 
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">داشبورد مدیریت</h1>
+        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">داشبورد مدیریت</h1>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (
             <div 
               key={index} 
-              className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 p-6 transform transition-all duration-300 hover:scale-105"
+              className="p-6 transition-all duration-300 transform border border-gray-200 rounded-lg shadow-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 hover:scale-105"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">{stat.title}</p>
-                  <h3 className="text-2xl font-bold mt-1 text-gray-900 dark:text-white">{stat.value}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{stat.title}</p>
+                  <h3 className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</h3>
                 </div>
-                <stat.icon className="h-8 w-8 text-primary-700 dark:text-primary-300" />
+                <stat.icon className="w-8 h-8 text-primary-700 dark:text-primary-300" />
               </div>
               <div className="mt-4">
                 <span className={`text-sm ${stat.change.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                   {stat.change}
                 </span>
-                <span className="text-gray-600 dark:text-gray-300 text-sm"> نسبت به ماه قبل</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300"> نسبت به ماه قبل</span>
               </div>
             </div>
           ))}
         </div>
 
         {/* Top Books */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">محبوب‌ترین کتاب‌ها</h2>
+        <div className="p-6 mb-8 bg-white rounded-lg shadow dark:bg-gray-800">
+          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">محبوب‌ترین کتاب‌ها</h2>
           <div className="overflow-x-auto">
-            <table className="w-full table-auto font-sans border-collapse">
+            <table className="w-full font-sans border-collapse table-auto">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-                  <th className="py-3 px-4 text-gray-900 dark:text-white text-right">نام کتاب</th>
-                  <th className="py-3 px-4 text-gray-900 dark:text-white text-right">نویسنده</th>
-                  <th className="py-3 px-4 text-gray-900 dark:text-white text-right">تعداد فروش</th>
-                  <th className="py-3 px-4 text-gray-900 dark:text-white text-right">قیمت</th>
+                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">نام کتاب</th>
+                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">نویسنده</th>
+                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">تعداد فروش</th>
+                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">قیمت</th>
                 </tr>
               </thead>
               <tbody>
                 {topBooks.map((book) => (
                   <tr key={book.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="py-3 px-4 text-gray-900 dark:text-white text-right truncate">{book.title}</td>
-                    <td className="py-3 px-4 text-gray-900 dark:text-white text-right truncate">{book.author}</td>
-                    <td className="py-3 px-4 text-gray-900 dark:text-white text-right">{book.sales}</td>
-                    <td className="py-3 px-4 text-gray-900 dark:text-white text-right">{book.price} تومان</td>
+                    <td className="px-4 py-3 text-right text-gray-900 truncate dark:text-white">{book.title}</td>
+                    <td className="px-4 py-3 text-right text-gray-900 truncate dark:text-white">{book.author}</td>
+                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{book.sales}</td>
+                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{book.price} تومان</td>
                   </tr>
                 ))}
               </tbody>
@@ -307,25 +307,25 @@ const Dashboard = () => {
         </div>
 
         {/* Active Users */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">کاربران فعال اخیر</h2>
+        <div className="p-6 mb-8 bg-white rounded-lg shadow dark:bg-gray-800">
+          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">کاربران فعال اخیر</h2>
           <div className="overflow-x-auto">
-            <table className="w-full table-auto font-sans border-collapse">
+            <table className="w-full font-sans border-collapse table-auto">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-                  <th className="py-3 px-4 text-gray-900 dark:text-white text-right">نام کاربر</th>
-                  <th className="py-3 px-4 text-gray-900 dark:text-white text-right">ایمیل</th>
-                  <th className="py-3 px-4 text-gray-900 dark:text-white text-right">آخرین فعالیت</th>
-                  <th className="py-3 px-4 text-gray-900 dark:text-white text-right">تعداد سفارشات</th>
+                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">نام کاربر</th>
+                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">ایمیل</th>
+                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">آخرین فعالیت</th>
+                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">تعداد سفارشات</th>
                 </tr>
               </thead>
               <tbody>
                 {activeUsers.map((user) => (
                   <tr key={user.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="py-3 px-4 text-gray-900 dark:text-white text-right truncate">{user.name}</td>
-                    <td className="py-3 px-4 text-gray-900 dark:text-white text-right truncate">{user.email}</td>
-                    <td className="py-3 px-4 text-gray-900 dark:text-white text-right">{user.lastActivity}</td>
-                    <td className="py-3 px-4 text-gray-900 dark:text-white text-right">{user.orders}</td>
+                    <td className="px-4 py-3 text-right text-gray-900 truncate dark:text-white">{user.name}</td>
+                    <td className="px-4 py-3 text-right text-gray-900 truncate dark:text-white">{user.email}</td>
+                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{user.lastActivity}</td>
+                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{user.orders}</td>
                   </tr>
                 ))}
               </tbody>
@@ -334,24 +334,28 @@ const Dashboard = () => {
         </div>
 
         {/* Recent Orders */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-4">
+        <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">سفارشات اخیر</h2>
-            <select 
-              className="w-48 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option>همه وضعیت‌ها</option>
-              <option>در انتظار پرداخت</option>
-              <option>در حال پردازش</option>
-              <option>ارسال شده</option>
-              <option>تحویل شده</option>
-              <option>لغو شده</option>
-            </select>
+            <div className="flex items-center gap-2">
+              <label htmlFor="status-filter" className="text-gray-900 dark:text-white">فیلتر وضعیت:</label>
+              <select 
+                id="status-filter"
+                className="w-48 px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option>همه وضعیت‌ها</option>
+                <option>در انتظار پرداخت</option>
+                <option>در حال پردازش</option>
+                <option>ارسال شده</option>
+                <option>تحویل شده</option>
+                <option>لغو شده</option>
+              </select>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full table-fixed font-sans border-collapse min-w-[800px]">
@@ -360,55 +364,55 @@ const Dashboard = () => {
                   <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('id')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       شماره سفارش
                       {sortConfig.key === 'id' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
                   <th className="w-[20%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('customer')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       مشتری
                       {sortConfig.key === 'customer' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
                   <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('date')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       تاریخ
                       {sortConfig.key === 'date' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
                   <th className="w-[20%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('status')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       وضعیت
                       {sortConfig.key === 'status' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
                   <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('amount')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       مبلغ
                       {sortConfig.key === 'amount' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
@@ -433,14 +437,15 @@ const Dashboard = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-0">
+          <div className="flex flex-col items-center justify-between p-4 mt-4 bg-white rounded-lg shadow sm:flex-row dark:bg-gray-800">
+            <div className="flex flex-col items-center gap-4 mb-4 sm:flex-row sm:mb-0">
               <div className="flex items-center gap-2">
-                <label className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
+                <label htmlFor="items-per-page" className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
                 <select
+                  id="items-per-page"
                   value={itemsPerPage}
                   onChange={handleItemsPerPageChange}
-                  className="py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
@@ -452,18 +457,19 @@ const Dashboard = () => {
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
               <div className="flex items-center gap-2">
                 <button
                   onClick={goToPreviousPage}
                   disabled={currentPage === 1}
+                  aria-label="صفحه قبلی"
                   className={`p-2 rounded-lg transition-colors ${
                     currentPage === 1
                       ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                       : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronRight className="w-5 h-5" />
                 </button>
                 <div className="flex gap-1">
                   {getPageNumbers().map((page, index) => (
@@ -486,13 +492,14 @@ const Dashboard = () => {
                 <button
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages}
+                  aria-label="صفحه بعدی"
                   className={`p-2 rounded-lg transition-colors ${
                     currentPage === totalPages
                       ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                       : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <ChevronLeft className="h-5 w-5" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -501,13 +508,15 @@ const Dashboard = () => {
                   value={goToPageInput}
                   onChange={(e) => setGoToPageInput(e.target.value)}
                   placeholder="شماره صفحه"
-                  className="w-24 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-24 px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   min="1"
                   max={totalPages}
                 />
                 <button
                   onClick={handleGoToPage}
-                  className="px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  aria-label="برو به صفحه مورد نظر"
+                  title="برو به صفحه مورد نظر"
+                  className="px-3 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
                 >
                   برو
                 </button>
@@ -517,13 +526,15 @@ const Dashboard = () => {
         </div>
 
         {showScrollToTop && (
-          <button
-            onClick={scrollToTop}
-            className="fixed bottom-6 left-6 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-colors"
-          >
-            <ArrowUp className="h-6 w-6" />
-          </button>
-        )}
+  <button
+    onClick={scrollToTop}
+    aria-label="برو به بالای صفحه"
+    title="برو به بالای صفحه"
+    className="fixed p-3 text-white transition-colors rounded-full shadow-lg bottom-6 left-6 bg-primary-600 hover:bg-primary-700"
+  >
+    <ArrowUp className="w-6 h-6" />
+  </button>
+)}
       </div>
     </>
   );

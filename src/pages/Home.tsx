@@ -1,7 +1,8 @@
+// src/pages/Home.tsx
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { Book, Star, Truck, CreditCard, Headphones, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { Book as BookIcon, Star, Truck, CreditCard, Headphones, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { Link } from 'react-router-dom';
@@ -9,21 +10,17 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { useHomeContent } from '../context/HomeContentContext';
-import { useCart } from '../context/CartContext'; // اضافه کردن
+import { useCart } from '../context/CartContext';
+import { Book } from '../types';
 
-// تعریف تایپ‌ها
-interface Book {
+// تعریف تایپ CartItem (برای هماهنگی با CartContext)
+interface CartItem {
   id: number;
   title: string;
   author: string;
   price: number;
+  quantity: number;
   image: string;
-  rating?: number;
-  format: string;
-  description: string;
-  category: string;
-  createdAt?: string;
-  quantity: number,
 }
 
 interface Slide {
@@ -48,11 +45,6 @@ interface Section {
   visible: boolean;
 }
 
-interface HomeContent {
-  slider: Slide[];
-  sections: Section[];
-}
-
 interface HomeProps {
   books: Book[];
   isLoading?: boolean;
@@ -60,10 +52,11 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) => {
-  const { homeContent } = useHomeContent();
-  const { addToCart } = useCart(); // اضافه کردن
+  const { content } = useHomeContent();
+  const { addToCart } = useCart();
 
-  // مرتب‌سازی کتاب‌ها بر اساس تاریخ ایجاد (جدیدترین‌ها)
+  const homeContent = content.pages['home'] || { slider: [], sections: [] };
+
   const latestBooks = [...books]
     .sort((a, b) => {
       if (!a.createdAt || !b.createdAt) return 0;
@@ -71,8 +64,9 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
     })
     .slice(0, 4);
 
-  // محدود کردن کتاب‌های ویژه به ۴ کتاب (چون ۱ کارت برای "نمایش بیشتر" است)
-  const featuredBooks = books.slice(0, 4);
+  const featuredSection = homeContent.sections.find((s: Section) => s.type === 'featured-books');
+  const featuredBookIds = featuredSection ? (featuredSection.content as string[]).map(Number) : [];
+  const featuredBooks = books.filter((book) => featuredBookIds.includes(book.id)).slice(0, 4);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -86,6 +80,16 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+  // تابع برای تبدیل Book به CartItem
+  const convertBookToCartItem = (book: Book): CartItem => ({
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    price: book.price,
+    image: book.image,
+    quantity: 1, // مقدار پیش‌فرض برای quantity
+  });
 
   if (isLoading) {
     return (
@@ -113,7 +117,6 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
     );
   }
 
-  // مرتب‌سازی بخش‌ها: ویژگی‌ها در بالا، سپس جدیدترین‌ها، سپس بقیه
   const orderedSections = [
     ...homeContent.sections.filter((s: Section) => s.visible && s.type === 'features'),
     { id: Date.now(), title: 'جدیدترین‌ها', type: 'latest-books' as const, content: [], visible: true },
@@ -129,8 +132,7 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
         <meta name="description" content="خرید آنلاین کتاب‌های الکترونیکی و چاپی با بهترین قیمت و ارسال سریع" />
       </Helmet>
 
-      {/* Hero Section with Slider */}
-      {homeContent.slider.length > 0 && (
+      {homeContent.slider && homeContent.slider.length > 0 && (
         <section className="relative">
           <Swiper
             modules={[Navigation, Pagination, Autoplay]}
@@ -179,7 +181,6 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
         </section>
       )}
 
-      {/* Dynamic Sections */}
       <motion.div
         className="py-16"
         variants={containerVariants}
@@ -197,7 +198,6 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                   {section.title}
                 </motion.h2>
 
-                {/* بخش ویژگی‌ها */}
                 {section.type === 'features' && Array.isArray(section.content) && (
                   <motion.div
                     variants={containerVariants}
@@ -222,7 +222,6 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                   </motion.div>
                 )}
 
-                {/* بخش جدیدترین‌ها */}
                 {section.type === 'latest-books' && (
                   <motion.div
                     variants={containerVariants}
@@ -253,7 +252,7 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => addToCart(book)} // استفاده از addToCart
+                            onClick={() => addToCart(convertBookToCartItem(book))}
                             className="flex items-center justify-center w-full gap-2 py-2 text-white transition-colors rounded-md bg-primary-600 hover:bg-primary-700"
                           >
                             <ShoppingCart className="w-5 h-5" />
@@ -265,7 +264,6 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                   </motion.div>
                 )}
 
-                {/* بخش کتاب‌های ویژه */}
                 {section.type === 'featured-books' && Array.isArray(section.content) && (
                   <motion.div
                     variants={containerVariants}
@@ -296,7 +294,7 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => addToCart(book)} // استفاده از addToCart
+                            onClick={() => addToCart(convertBookToCartItem(book))}
                             className="flex items-center justify-center w-full gap-2 py-2 text-white transition-colors rounded-md bg-primary-600 hover:bg-primary-700"
                           >
                             <ShoppingCart className="w-5 h-5" />
@@ -305,7 +303,6 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                         </div>
                       </motion.div>
                     ))}
-                    {/* کارت نمایش بیشتر */}
                     <motion.div
                       variants={itemVariants}
                       whileHover={{ scale: 1.05, boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}
@@ -327,14 +324,13 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                   </motion.div>
                 )}
 
-                {/* بخش دسته‌بندی‌ها */}
                 {section.type === 'categories' && Array.isArray(section.content) && (
                   <motion.div
                     variants={containerVariants}
                     className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
                   >
                     {(section.content as string[])
-                      .slice(0, 4) // محدود کردن به ۴ دسته‌بندی (چون ۱ کارت برای "نمایش بیشتر" است)
+                      .slice(0, 4)
                       .map((category: string, index: number) => (
                         <Link key={index} to={`/category/${encodeURIComponent(category)}`} className="block">
                           <motion.div
@@ -342,12 +338,11 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                             whileHover={{ scale: 1.05, boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}
                             className="p-6 text-center bg-white rounded-lg cursor-pointer dark:bg-gray-900"
                           >
-                            <Book className="w-12 h-12 mx-auto mb-4 text-primary-600 dark:text-primary-400" />
+                            <BookIcon className="w-12 h-12 mx-auto mb-4 text-primary-600 dark:text-primary-400" />
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{category}</h3>
                           </motion.div>
                         </Link>
                       ))}
-                    {/* کارت نمایش بیشتر برای دسته‌بندی‌ها */}
                     <motion.div
                       variants={itemVariants}
                       whileHover={{ scale: 1.05, boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}
@@ -370,7 +365,6 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                 )}
               </div>
             </section>
-            {/* خط جداکننده بین بخش‌ها */}
             {index < orderedSections.length - 1 && (
               <hr className="mx-auto my-8 border-t border-gray-300 opacity-50 max-w-7xl" />
             )}

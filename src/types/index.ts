@@ -1,3 +1,4 @@
+
 export interface Book {
   id: number;
   title: string;
@@ -5,9 +6,11 @@ export interface Book {
   price: number;
   image: string;
   rating: number;
+  format: 'print' | 'ebook' | 'both';
+  description: string;
   category: string;
-  description?: string;
-  format?: 'print' | 'ebook' | 'both';
+  createdAt?: string;
+  quantity?: number;
 }
 
 export interface CartItem {
@@ -15,6 +18,6 @@ export interface CartItem {
   title: string;
   author: string;
   price: number;
-  image: string;
   quantity: number;
+  image: string;
 }

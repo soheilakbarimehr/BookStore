@@ -1,3 +1,4 @@
+// src/pages/admin/HomeSettings.tsx
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useHomeContent } from '../../context/HomeContentContext';
@@ -5,18 +6,51 @@ import { Trash2, Plus, Eye, EyeOff, Truck, CreditCard, Headphones, Edit2, Eye as
 import Swal from 'sweetalert2';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-const HomeSettings = () => {
-  const { homeContent, updateSlider, updateSections } = useHomeContent();
+interface Slide {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  buttonLink: string;
+}
 
-  // تابع برای نمایش Toast موفقیت
+// تایپ جدید برای Slide که شامل index هم می‌شه
+interface SlideWithIndex extends Slide {
+  index: number;
+}
+
+interface Feature {
+  title: string;
+  description: string;
+  icon: 'Truck' | 'CreditCard' | 'Headphones';
+}
+
+interface Section {
+  id: number;
+  title: string;
+  type: 'featured-books' | 'categories' | 'features' | 'custom' | 'latest-books';
+  content: string[] | Feature[] | string;
+  visible: boolean;
+}
+
+// تایپ جدید برای Section که شامل index هم می‌شه
+interface SectionWithIndex extends Section {
+  index: number;
+}
+
+const HomeSettings = () => {
+  const { content, updateSlider, updateSections } = useHomeContent();
+  const page = 'home';
+  const homeContent = content.pages[page] || { slider: [], sections: [] };
+
   const showSuccessToast = (message: string) => {
     Swal.fire({
       toast: true,
-      position: 'bottom-end', // پایین سمت راست
+      position: 'bottom-end',
       icon: 'success',
       title: message,
       showConfirmButton: false,
-      timer: 3000, // 3 ثانیه نمایش داده می‌شه
+      timer: 3000,
       timerProgressBar: true,
       didOpen: (toast) => {
         toast.addEventListener('mouseenter', Swal.stopTimer);
@@ -33,8 +67,8 @@ const HomeSettings = () => {
     buttonLink: '',
   });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [editSliderItem, setEditSliderItem] = useState<any>(null);
-  const [previewSlider, setPreviewSlider] = useState<any[]>([]);
+  const [editSliderItem, setEditSliderItem] = useState<SlideWithIndex | null>(null); // استفاده از SlideWithIndex
+  const [previewSlider, setPreviewSlider] = useState<Slide[]>([]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -68,20 +102,20 @@ const HomeSettings = () => {
       return;
     }
 
-    const newItem = {
-      id: homeContent.slider.length + 1,
+    const newItem: Slide = {
+      id: (homeContent.slider?.length || 0) + 1,
       ...newSliderItem,
     };
 
-    updateSlider([...homeContent.slider, newItem]);
+    updateSlider(page, [...(homeContent.slider || []), newItem]);
     setNewSliderItem({ image: '', title: '', description: '', buttonLink: '' });
     setPreviewImage(null);
-    showSuccessToast('اسلاید با موفقیت اضافه شد!'); // نمایش Toast
+    showSuccessToast('اسلاید با موفقیت اضافه شد!');
   };
 
   const handleEditSliderItem = (index: number) => {
-    const item = homeContent.slider[index];
-    setEditSliderItem({ ...item, index });
+    const item = homeContent.slider![index];
+    setEditSliderItem({ ...item, index }); // حالا با SlideWithIndex سازگاره
     setNewSliderItem({
       image: item.image,
       title: item.title,
@@ -109,29 +143,29 @@ const HomeSettings = () => {
       return;
     }
 
-    const updatedSlider = [...homeContent.slider];
+    const updatedSlider = [...(homeContent.slider || [])];
     updatedSlider[editSliderItem.index] = { ...editSliderItem, ...newSliderItem };
-    updateSlider(updatedSlider);
+    updateSlider(page, updatedSlider);
     setEditSliderItem(null);
     setNewSliderItem({ image: '', title: '', description: '', buttonLink: '' });
     setPreviewImage(null);
-    showSuccessToast('اسلاید با موفقیت به‌روزرسانی شد!'); // نمایش Toast
+    showSuccessToast('اسلاید با موفقیت به‌روزرسانی شد!');
   };
 
   const handleDeleteSliderItem = (index: number) => {
-    updateSlider(homeContent.slider.filter((_, i) => i !== index));
-    showSuccessToast('اسلاید با موفقیت حذف شد!'); // نمایش Toast
+    updateSlider(page, (homeContent.slider || []).filter((_: any, i: number) => i !== index));
+    showSuccessToast('اسلاید با موفقیت حذف شد!');
   };
 
   const handlePreviewSlider = () => {
-    setPreviewSlider(homeContent.slider);
+    setPreviewSlider(homeContent.slider || []);
     Swal.fire({
       title: 'پیش‌نمایش اسلایدر',
       html: `
         <div class="relative h-[300px] overflow-hidden">
-          ${homeContent.slider
+          ${(homeContent.slider || [])
             .map(
-              (slide, index) => `
+              (slide: Slide, index: number) => `
               <div class="absolute inset-0 transition-opacity duration-500 ${
                 index === 0 ? 'opacity-100' : 'opacity-0'
               }">
@@ -156,31 +190,28 @@ const HomeSettings = () => {
 
   const onDragEndSlider = (result: any) => {
     if (!result.destination) return;
-    const reorderedSlider = Array.from(homeContent.slider);
+    const reorderedSlider = Array.from(homeContent.slider || []);
     const [movedItem] = reorderedSlider.splice(result.source.index, 1);
     reorderedSlider.splice(result.destination.index, 0, movedItem);
-    updateSlider(reorderedSlider);
-    showSuccessToast('ترتیب اسلایدها با موفقیت تغییر کرد!'); // نمایش Toast
+    updateSlider(page, reorderedSlider);
+    showSuccessToast('ترتیب اسلایدها با موفقیت تغییر کرد!');
   };
 
   // مدیریت بخش‌ها
   const [newSection, setNewSection] = useState({
     title: '',
-    type: 'custom' as 'featured-books' | 'categories' | 'custom' | 'features',
+    type: 'custom' as 'featured-books' | 'categories' | 'custom' | 'features' | 'latest-books',
     content: '',
   });
-  const [editSection, setEditSection] = useState<any>(null);
-  const [previewSections, setPreviewSections] = useState<any[]>([]);
+  const [editSection, setEditSection] = useState<SectionWithIndex | null>(null); // استفاده از SectionWithIndex
+  const [previewSections, setPreviewSections] = useState<Section[]>([]);
 
-  // مدیریت ویژگی‌ها (برای نوع features)
-  const [newFeature, setNewFeature] = useState({
-    icon: 'Truck' as 'Truck' | 'CreditCard' | 'Headphones',
+  const [newFeature, setNewFeature] = useState<Feature>({
+    icon: 'Truck',
     title: '',
     description: '',
   });
-  const [featuresList, setFeaturesList] = useState<
-    { icon: 'Truck' | 'CreditCard' | 'Headphones'; title: string; description: string }[]
-  >([]);
+  const [featuresList, setFeaturesList] = useState<Feature[]>([]);
 
   const handleAddFeature = () => {
     if (!newFeature.title || !newFeature.description) {
@@ -193,7 +224,7 @@ const HomeSettings = () => {
     }
     setFeaturesList([...featuresList, newFeature]);
     setNewFeature({ icon: 'Truck', title: '', description: '' });
-    showSuccessToast('ویژگی با موفقیت اضافه شد!'); // نمایش Toast
+    showSuccessToast('ویژگی با موفقیت اضافه شد!');
   };
 
   const handleAddSection = () => {
@@ -206,7 +237,7 @@ const HomeSettings = () => {
       return;
     }
 
-    let content: string | string[] | { icon: string; title: string; description: string }[];
+    let content: string | string[] | Feature[];
     if (newSection.type === 'features') {
       if (featuresList.length === 0) {
         Swal.fire({
@@ -229,7 +260,7 @@ const HomeSettings = () => {
       content = newSection.type === 'custom' ? newSection.content : newSection.content.split(',').map((item) => item.trim());
     }
 
-    const newItem = {
+    const newItem: Section = {
       id: homeContent.sections.length + 1,
       title: newSection.title,
       type: newSection.type,
@@ -237,22 +268,22 @@ const HomeSettings = () => {
       visible: true,
     };
 
-    updateSections([...homeContent.sections, newItem]);
+    updateSections(page, [...homeContent.sections, newItem]);
     setNewSection({ title: '', type: 'custom', content: '' });
     setFeaturesList([]);
-    showSuccessToast('بخش با موفقیت اضافه شد!'); // نمایش Toast
+    showSuccessToast('بخش با موفقیت اضافه شد!');
   };
 
   const handleEditSection = (index: number) => {
     const section = homeContent.sections[index];
-    setEditSection({ ...section, index });
+    setEditSection({ ...section, index }); // حالا با SectionWithIndex سازگاره
     setNewSection({
       title: section.title,
       type: section.type,
-      content: Array.isArray(section.content) ? section.content.join(', ') : section.content,
+      content: Array.isArray(section.content) ? section.content.map((item: Feature | string) => (typeof item === 'string' ? item : item.title)).join(', ') : section.content,
     });
     if (section.type === 'features') {
-      setFeaturesList(section.content);
+      setFeaturesList(section.content as Feature[]);
     }
   };
 
@@ -268,7 +299,7 @@ const HomeSettings = () => {
       return;
     }
 
-    let content: string | string[] | { icon: string; title: string; description: string }[];
+    let content: string | string[] | Feature[];
     if (newSection.type === 'features') {
       if (featuresList.length === 0) {
         Swal.fire({
@@ -293,11 +324,11 @@ const HomeSettings = () => {
 
     const updatedSections = [...homeContent.sections];
     updatedSections[editSection.index] = { ...editSection, title: newSection.title, type: newSection.type, content };
-    updateSections(updatedSections);
+    updateSections(page, updatedSections);
     setEditSection(null);
     setNewSection({ title: '', type: 'custom', content: '' });
     setFeaturesList([]);
-    showSuccessToast('بخش با موفقیت به‌روزرسانی شد!'); // نمایش Toast
+    showSuccessToast('بخش با موفقیت به‌روزرسانی شد!');
   };
 
   const handlePreviewSections = () => {
@@ -307,19 +338,19 @@ const HomeSettings = () => {
       html: `
         <div class="space-y-4">
           ${homeContent.sections
-            .filter((section) => section.visible)
+            .filter((section: Section) => section.visible)
             .map(
-              (section) => `
+              (section: Section) => `
               <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">${section.title}</h2>
                 <p class="text-gray-600 dark:text-gray-300">
                   ${
                     section.type === 'features'
-                      ? (section.content as { title: string }[])
-                          .map((f) => `${f.title}: ${f.description}`)
+                      ? (section.content as Feature[])
+                          .map((f: Feature) => `${f.title}: ${f.description}`)
                           .join('<br>')
                       : Array.isArray(section.content)
-                      ? section.content.join(', ')
+                      ? (section.content as string[]).join(', ')
                       : section.content
                   }
                 </p>
@@ -339,20 +370,20 @@ const HomeSettings = () => {
     const reorderedSections = Array.from(homeContent.sections);
     const [movedItem] = reorderedSections.splice(result.source.index, 1);
     reorderedSections.splice(result.destination.index, 0, movedItem);
-    updateSections(reorderedSections);
-    showSuccessToast('ترتیب بخش‌ها با موفقیت تغییر کرد!'); // نمایش Toast
+    updateSections(page, reorderedSections);
+    showSuccessToast('ترتیب بخش‌ها با موفقیت تغییر کرد!');
   };
 
   const handleToggleSectionVisibility = (index: number) => {
     const updatedSections = [...homeContent.sections];
     updatedSections[index].visible = !updatedSections[index].visible;
-    updateSections(updatedSections);
-    showSuccessToast(updatedSections[index].visible ? 'بخش نمایش داده شد!' : 'بخش مخفی شد!'); // نمایش Toast
+    updateSections(page, updatedSections);
+    showSuccessToast(updatedSections[index].visible ? 'بخش نمایش داده شد!' : 'بخش مخفی شد!');
   };
 
   const handleDeleteSection = (index: number) => {
-    updateSections(homeContent.sections.filter((_, i) => i !== index));
-    showSuccessToast('بخش با موفقیت حذف شد!'); // نمایش Toast
+    updateSections(page, homeContent.sections.filter((_: any, i: number) => i !== index));
+    showSuccessToast('بخش با موفقیت حذف شد!');
   };
 
   return (
@@ -361,31 +392,33 @@ const HomeSettings = () => {
         <title>تنظیمات صفحه اصلی | کتاب‌خانه</title>
       </Helmet>
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">تنظیمات صفحه اصلی</h1>
+        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">تنظیمات صفحه اصلی</h1>
 
-        {/* مدیریت اسلایدر */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">مدیریت اسلایدر</h2>
+        <div className="p-6 mb-8 bg-white rounded-lg shadow dark:bg-gray-800">
+          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">مدیریت اسلایدر</h2>
 
-          {/* فرم اضافه کردن/ویرایش آیتم */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
               {editSliderItem ? 'ویرایش آیتم اسلایدر' : 'اضافه کردن آیتم جدید'}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="relative p-6 text-center border-2 border-gray-300 border-dashed rounded-lg dark:border-gray-600">
+                <label htmlFor="image-upload" className="sr-only">
+                  آپلود تصویر
+                </label>
                 <input
+                  id="image-upload"
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
                 {previewImage ? (
-                  <img src={previewImage} alt="Preview" className="mx-auto w-32 h-32 object-cover rounded-lg" />
+                  <img src={previewImage} alt="Preview" className="object-cover w-32 h-32 mx-auto rounded-lg" />
                 ) : (
                   <div>
                     <svg
-                      className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
+                      className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500"
                       stroke="currentColor"
                       fill="none"
                       viewBox="0 0 48 48"
@@ -404,79 +437,99 @@ const HomeSettings = () => {
                   </div>
                 )}
               </div>
-              <input
-                type="text"
-                placeholder="عنوان"
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                value={newSliderItem.title}
-                onChange={(e) => setNewSliderItem({ ...newSliderItem, title: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="توضیحات"
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                value={newSliderItem.description}
-                onChange={(e) => setNewSliderItem({ ...newSliderItem, description: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="لینک دکمه (مثال: /books)"
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                value={newSliderItem.buttonLink}
-                onChange={(e) => setNewSliderItem({ ...newSliderItem, buttonLink: e.target.value })}
-              />
+              <div>
+                <label htmlFor="slider-title" className="sr-only">
+                  عنوان اسلایدر
+                </label>
+                <input
+                  id="slider-title"
+                  type="text"
+                  placeholder="عنوان"
+                  className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  value={newSliderItem.title}
+                  onChange={(e) => setNewSliderItem({ ...newSliderItem, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <label htmlFor="slider-description" className="sr-only">
+                  توضیحات اسلایدر
+                </label>
+                <input
+                  id="slider-description"
+                  type="text"
+                  placeholder="توضیحات"
+                  className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  value={newSliderItem.description}
+                  onChange={(e) => setNewSliderItem({ ...newSliderItem, description: e.target.value })}
+                />
+              </div>
+              <div>
+                <label htmlFor="slider-buttonLink" className="sr-only">
+                  لینک دکمه اسلایدر
+                </label>
+                <input
+                  id="slider-buttonLink"
+                  type="text"
+                  placeholder="لینک دکمه (مثال: /books)"
+                  className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  value={newSliderItem.buttonLink}
+                  onChange={(e) => setNewSliderItem({ ...newSliderItem, buttonLink: e.target.value })}
+                />
+              </div>
             </div>
-            <div className="mt-4 flex gap-2">
+            <div className="flex gap-2 mt-4">
               {editSliderItem ? (
                 <button
                   onClick={handleUpdateSliderItem}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="px-4 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
+                  aria-label="به‌روزرسانی اسلاید"
                 >
-                  <Edit2 className="inline-block h-5 w-5 ml-2" />
+                  <Edit2 className="inline-block w-5 h-5 ml-2" />
                   به‌روزرسانی
                 </button>
               ) : (
                 <button
                   onClick={handleAddSliderItem}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="px-4 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
+                  aria-label="اضافه کردن اسلاید"
                 >
-                  <Plus className="inline-block h-5 w-5 ml-2" />
+                  <Plus className="inline-block w-5 h-5 ml-2" />
                   اضافه کردن
                 </button>
               )}
               <button
                 onClick={handlePreviewSlider}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 text-white transition-colors bg-gray-600 rounded-lg hover:bg-gray-700"
+                aria-label="پیش‌نمایش اسلایدر"
               >
-                <PreviewIcon className="inline-block h-5 w-5 ml-2" />
+                <PreviewIcon className="inline-block w-5 h-5 ml-2" />
                 پیش‌نمایش
               </button>
             </div>
           </div>
 
-          {/* لیست آیتم‌های اسلایدر با Drag-and-Drop */}
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">آیتم‌های اسلایدر</h3>
-            {homeContent.slider.length === 0 ? (
+            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">آیتم‌های اسلایدر</h3>
+            {(!homeContent.slider || homeContent.slider.length === 0) ? (
               <p className="text-gray-600 dark:text-gray-300">هیچ آیتمی وجود ندارد.</p>
             ) : (
               <DragDropContext onDragEnd={onDragEndSlider}>
                 <Droppable droppableId="slider">
                   {(provided) => (
                     <ul className="space-y-4" {...provided.droppableProps} ref={provided.innerRef}>
-                      {homeContent.slider.map((item, index) => (
+                      {(homeContent.slider || []).map((item: Slide, index: number) => (
                         <Draggable key={item.id} draggableId={String(item.id)} index={index}>
                           {(provided) => (
                             <li
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                              className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700"
                             >
                               <div className="flex items-center gap-4">
-                                <img src={item.image} alt={item.title} className="w-16 h-16 object-cover rounded" />
+                                <img src={item.image} alt={item.title} className="object-cover w-16 h-16 rounded" />
                                 <div>
-                                  <h4 className="text-gray-900 dark:text-white font-semibold">{item.title}</h4>
+                                  <h4 className="font-semibold text-gray-900 dark:text-white">{item.title}</h4>
                                   <p className="text-gray-600 dark:text-gray-300">{item.description}</p>
                                   <p className="text-gray-600 dark:text-gray-300">لینک: {item.buttonLink}</p>
                                 </div>
@@ -485,14 +538,16 @@ const HomeSettings = () => {
                                 <button
                                   onClick={() => handleEditSliderItem(index)}
                                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                                  aria-label="ویرایش اسلاید"
                                 >
-                                  <Edit2 className="h-5 w-5" />
+                                  <Edit2 className="w-5 h-5" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteSliderItem(index)}
                                   className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                  aria-label="حذف اسلاید"
                                 >
-                                  <Trash2 className="h-5 w-5" />
+                                  <Trash2 className="w-5 h-5" />
                                 </button>
                               </div>
                             </li>
@@ -508,119 +563,153 @@ const HomeSettings = () => {
           </div>
         </div>
 
-        {/* مدیریت بخش‌ها */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">مدیریت بخش‌ها</h2>
+        <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
+          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">مدیریت بخش‌ها</h2>
 
-          {/* فرم اضافه کردن/ویرایش بخش */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
               {editSection ? 'ویرایش بخش' : 'اضافه کردن بخش جدید'}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input
-                type="text"
-                placeholder="عنوان بخش"
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                value={newSection.title}
-                onChange={(e) => setNewSection({ ...newSection, title: e.target.value })}
-              />
-              <select
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                value={newSection.type}
-                onChange={(e) =>
-                  setNewSection({
-                    ...newSection,
-                    type: e.target.value as 'featured-books' | 'categories' | 'custom' | 'features',
-                  })
-                }
-              >
-                <option value="featured-books">کتاب‌های ویژه (ID کتاب‌ها با کاما جدا کنید)</option>
-                <option value="categories">دسته‌بندی‌ها (نام دسته‌ها با کاما جدا کنید)</option>
-                <option value="custom">سفارشی (متن دلخواه)</option>
-                <option value="features">ویژگی‌ها (ارسال سریع، پرداخت امن و ...)</option>
-              </select>
-              {newSection.type !== 'features' && (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div>
+                <label htmlFor="section-title" className="sr-only">
+                  عنوان بخش
+                </label>
                 <input
+                  id="section-title"
                   type="text"
-                  placeholder={
-                    newSection.type === 'custom'
-                      ? 'محتوای بخش'
-                      : newSection.type === 'featured-books'
-                      ? 'ID کتاب‌ها (مثال: 1,2,3)'
-                      : 'نام دسته‌ها (مثال: ادبیات داستانی,توسعه فردی)'
-                  }
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  value={newSection.content}
-                  onChange={(e) => setNewSection({ ...newSection, content: e.target.value })}
+                  placeholder="عنوان بخش"
+                  className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  value={newSection.title}
+                  onChange={(e) => setNewSection({ ...newSection, title: e.target.value })}
                 />
+              </div>
+              <div>
+                <label htmlFor="section-type" className="sr-only">
+                  نوع بخش
+                </label>
+                <select
+                  id="section-type"
+                  className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  value={newSection.type}
+                  onChange={(e) =>
+                    setNewSection({
+                      ...newSection,
+                      type: e.target.value as 'featured-books' | 'categories' | 'custom' | 'features' | 'latest-books',
+                    })
+                  }
+                >
+                  <option value="featured-books">کتاب‌های ویژه (ID کتاب‌ها با کاما جدا کنید)</option>
+                  <option value="categories">دسته‌بندی‌ها (نام دسته‌ها با کاما جدا کنید)</option>
+                  <option value="custom">سفارشی (متن دلخواه)</option>
+                  <option value="features">ویژگی‌ها (ارسال سریع، پرداخت امن و ...)</option>
+                </select>
+              </div>
+              {newSection.type !== 'features' && (
+                <div>
+                  <label htmlFor="section-content" className="sr-only">
+                    محتوای بخش
+                  </label>
+                  <input
+                    id="section-content"
+                    type="text"
+                    placeholder={
+                      newSection.type === 'custom'
+                        ? 'محتوای بخش'
+                        : newSection.type === 'featured-books'
+                        ? 'ID کتاب‌ها (مثال: 1,2,3)'
+                        : 'نام دسته‌ها (مثال: ادبیات داستانی,توسعه فردی)'
+                    }
+                    className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    value={newSection.content}
+                    onChange={(e) => setNewSection({ ...newSection, content: e.target.value })}
+                  />
+                </div>
               )}
             </div>
 
-            {/* فرم اضافه کردن ویژگی‌ها (برای نوع features) */}
             {newSection.type === 'features' && (
               <div className="mt-4">
-                <h4 className="text-md font-semibold mb-2 text-gray-900 dark:text-white">اضافه کردن ویژگی</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <select
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    value={newFeature.icon}
-                    onChange={(e) =>
-                      setNewFeature({
-                        ...newFeature,
-                        icon: e.target.value as 'Truck' | 'CreditCard' | 'Headphones',
-                      })
-                    }
-                  >
-                    <option value="Truck">ارسال (Truck)</option>
-                    <option value="CreditCard">پرداخت (CreditCard)</option>
-                    <option value="Headphones">پشتیبانی (Headphones)</option>
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="عنوان ویژگی"
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    value={newFeature.title}
-                    onChange={(e) => setNewFeature({ ...newFeature, title: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    placeholder="توضیحات ویژگی"
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    value={newFeature.description}
-                    onChange={(e) => setNewFeature({ ...newFeature, description: e.target.value })}
-                  />
+                <h4 className="mb-2 font-semibold text-gray-900 text-md dark:text-white">اضافه کردن ویژگی</h4>
+                <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
+                  <div>
+                    <label htmlFor="feature-icon" className="sr-only">
+                      آیکون ویژگی
+                    </label>
+                    <select
+                      id="feature-icon"
+                      className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      value={newFeature.icon}
+                      onChange={(e) =>
+                        setNewFeature({
+                          ...newFeature,
+                          icon: e.target.value as 'Truck' | 'CreditCard' | 'Headphones',
+                        })
+                      }
+                    >
+                      <option value="Truck">ارسال (Truck)</option>
+                      <option value="CreditCard">پرداخت (CreditCard)</option>
+                      <option value="Headphones">پشتیبانی (Headphones)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="feature-title" className="sr-only">
+                      عنوان ویژگی
+                    </label>
+                    <input
+                      id="feature-title"
+                      type="text"
+                      placeholder="عنوان ویژگی"
+                      className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      value={newFeature.title}
+                      onChange={(e) => setNewFeature({ ...newFeature, title: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="feature-description" className="sr-only">
+                      توضیحات ویژگی
+                    </label>
+                    <input
+                      id="feature-description"
+                      type="text"
+                      placeholder="توضیحات ویژگی"
+                      className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      value={newFeature.description}
+                      onChange={(e) => setNewFeature({ ...newFeature, description: e.target.value })}
+                    />
+                  </div>
                 </div>
                 <button
                   onClick={handleAddFeature}
-                  className="mb-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="px-4 py-2 mb-4 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
+                  aria-label="اضافه کردن ویژگی"
                 >
-                  <Plus className="inline-block h-5 w-5 ml-2" />
+                  <Plus className="inline-block w-5 h-5 ml-2" />
                   اضافه کردن ویژگی
                 </button>
 
-                {/* لیست ویژگی‌ها */}
                 {featuresList.length > 0 && (
-                  <ul className="space-y-2 mb-4">
+                  <ul className="mb-4 space-y-2">
                     {featuresList.map((feature, index) => (
                       <li
                         key={index}
-                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                        className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700"
                       >
                         <div className="flex items-center gap-2">
-                          {feature.icon === 'Truck' && <Truck className="h-5 w-5 text-primary-600" />}
-                          {feature.icon === 'CreditCard' && <CreditCard className="h-5 w-5 text-primary-600" />}
-                          {feature.icon === 'Headphones' && <Headphones className="h-5 w-5 text-primary-600" />}
+                          {feature.icon === 'Truck' && <Truck className="w-5 h-5 text-primary-600" />}
+                          {feature.icon === 'CreditCard' && <CreditCard className="w-5 h-5 text-primary-600" />}
+                          {feature.icon === 'Headphones' && <Headphones className="w-5 h-5 text-primary-600" />}
                           <div>
-                            <p className="text-gray-900 dark:text-white font-semibold">{feature.title}</p>
+                            <p className="font-semibold text-gray-900 dark:text-white">{feature.title}</p>
                             <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
                           </div>
                         </div>
                         <button
                           onClick={() => setFeaturesList(featuresList.filter((_, i) => i !== index))}
                           className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                          aria-label="حذف ویژگی"
                         >
-                          <Trash2 className="h-5 w-5" />
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </li>
                     ))}
@@ -629,37 +718,39 @@ const HomeSettings = () => {
               </div>
             )}
 
-            <div className="mt-4 flex gap-2">
+            <div className="flex gap-2 mt-4">
               {editSection ? (
                 <button
                   onClick={handleUpdateSection}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="px-4 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
+                  aria-label="به‌روزرسانی بخش"
                 >
-                  <Edit2 className="inline-block h-5 w-5 ml-2" />
+                  <Edit2 className="inline-block w-5 h-5 ml-2" />
                   به‌روزرسانی بخش
                 </button>
               ) : (
                 <button
                   onClick={handleAddSection}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="px-4 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
+                  aria-label="اضافه کردن بخش"
                 >
-                  <Plus className="inline-block h-5 w-5 ml-2" />
+                  <Plus className="inline-block w-5 h-5 ml-2" />
                   اضافه کردن بخش
                 </button>
               )}
               <button
                 onClick={handlePreviewSections}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 text-white transition-colors bg-gray-600 rounded-lg hover:bg-gray-700"
+                aria-label="پیش‌نمایش بخش‌ها"
               >
-                <PreviewIcon className="inline-block h-5 w-5 ml-2" />
+                <PreviewIcon className="inline-block w-5 h-5 ml-2" />
                 پیش‌نمایش
               </button>
             </div>
           </div>
 
-          {/* لیست بخش‌ها با Drag-and-Drop */}
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">بخش‌های صفحه اصلی</h3>
+            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">بخش‌های صفحه اصلی</h3>
             {homeContent.sections.length === 0 ? (
               <p className="text-gray-600 dark:text-gray-300">هیچ بخشی وجود ندارد.</p>
             ) : (
@@ -667,26 +758,26 @@ const HomeSettings = () => {
                 <Droppable droppableId="sections">
                   {(provided) => (
                     <ul className="space-y-4" {...provided.droppableProps} ref={provided.innerRef}>
-                      {homeContent.sections.map((section, index) => (
+                      {homeContent.sections.map((section: Section, index: number) => (
                         <Draggable key={section.id} draggableId={String(section.id)} index={index}>
                           {(provided) => (
                             <li
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                              className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700"
                             >
                               <div>
-                                <h4 className="text-gray-900 dark:text-white font-semibold">{section.title}</h4>
+                                <h4 className="font-semibold text-gray-900 dark:text-white">{section.title}</h4>
                                 <p className="text-gray-600 dark:text-gray-300">
                                   نوع: {section.type === 'featured-books' ? 'کتاب‌های ویژه' : section.type === 'categories' ? 'دسته‌بندی‌ها' : section.type === 'custom' ? 'سفارشی' : 'ویژگی‌ها'}
                                 </p>
                                 <p className="text-gray-600 dark:text-gray-300">
                                   محتوا:{' '}
                                   {section.type === 'features'
-                                    ? (section.content as { title: string }[]).map((f) => f.title).join(', ')
+                                    ? (section.content as Feature[]).map((f: Feature) => f.title).join(', ')
                                     : Array.isArray(section.content)
-                                    ? section.content.join(', ')
+                                    ? (section.content as string[]).join(', ')
                                     : section.content}
                                 </p>
                               </div>
@@ -694,20 +785,23 @@ const HomeSettings = () => {
                                 <button
                                   onClick={() => handleEditSection(index)}
                                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                                  aria-label="ویرایش بخش"
                                 >
-                                  <Edit2 className="h-5 w-5" />
+                                  <Edit2 className="w-5 h-5" />
                                 </button>
                                 <button
                                   onClick={() => handleToggleSectionVisibility(index)}
                                   className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
+                                  aria-label={section.visible ? 'مخفی کردن بخش' : 'نمایش بخش'}
                                 >
-                                  {section.visible ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                                  {section.visible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                                 </button>
                                 <button
                                   onClick={() => handleDeleteSection(index)}
                                   className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                  aria-label="حذف بخش"
                                 >
-                                  <Trash2 className="h-5 w-5" />
+                                  <Trash2 className="w-5 h-5" />
                                 </button>
                               </div>
                             </li>

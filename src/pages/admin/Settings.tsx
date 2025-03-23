@@ -10,43 +10,47 @@ const AdminSettings = () => {
       </Helmet>
 
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">تنظیمات سیستم</h1>
+        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">تنظیمات سیستم</h1>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
           <form>
             {/* General Settings */}
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">تنظیمات عمومی</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">تنظیمات عمومی</h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">نام فروشگاه</label>
+                  <label htmlFor="store-name" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">نام فروشگاه</label>
                   <input
+                    id="store-name"
                     type="text"
-                    className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     defaultValue="کتاب‌خانه"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">ایمیل مدیریت</label>
+                  <label htmlFor="admin-email" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">ایمیل مدیریت</label>
                   <input
+                    id="admin-email"
                     type="email"
-                    className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     defaultValue="admin@example.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">شماره تماس</label>
+                  <label htmlFor="contact-number" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">شماره تماس</label>
                   <input
+                    id="contact-number"
                     type="tel"
-                    className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     defaultValue="۰۲۱-۱۲۳۴۵۶۷۸"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">آدرس</label>
+                  <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">آدرس</label>
                   <input
+                    id="address"
                     type="text"
-                    className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     defaultValue="تهران، خیابان ولیعصر"
                   />
                 </div>
@@ -55,21 +59,25 @@ const AdminSettings = () => {
 
             {/* Payment Settings */}
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">تنظیمات پرداخت</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">تنظیمات پرداخت</h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">درگاه پرداخت پیش‌فرض</label>
-                  <select className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <label htmlFor="payment-gateway" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">درگاه پرداخت پیش‌فرض</label>
+                  <select
+                    id="payment-gateway"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
                     <option>زرین‌پال</option>
                     <option>پی‌پینگ</option>
                     <option>ایدی‌پی</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">کلید API</label>
+                  <label htmlFor="api-key" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">کلید API</label>
                   <input
+                    id="api-key"
                     type="text"
-                    className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="کلید API درگاه پرداخت"
                   />
                 </div>
@@ -78,21 +86,23 @@ const AdminSettings = () => {
 
             {/* Shipping Settings */}
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">تنظیمات ارسال</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">تنظیمات ارسال</h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">حداقل مبلغ برای ارسال رایگان</label>
+                  <label htmlFor="free-shipping-threshold" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">حداقل مبلغ برای ارسال رایگان</label>
                   <input
+                    id="free-shipping-threshold"
                     type="number"
-                    className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     defaultValue="500000"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">هزینه ارسال پیش‌فرض</label>
+                  <label htmlFor="default-shipping-cost" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">هزینه ارسال پیش‌فرض</label>
                   <input
+                    id="default-shipping-cost"
                     type="number"
-                    className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     defaultValue="30000"
                   />
                 </div>
@@ -102,9 +112,9 @@ const AdminSettings = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg flex items-center gap-2"
+                className="flex items-center gap-2 px-6 py-2 text-white rounded-lg bg-primary-600 hover:bg-primary-700"
               >
-                <Save className="h-5 w-5" />
+                <Save className="w-5 h-5" />
                 ذخیره تنظیمات
               </button>
             </div>

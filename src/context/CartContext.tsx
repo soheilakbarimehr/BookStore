@@ -1,14 +1,7 @@
+// src/context/CartContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-
-interface CartItem {
-  id: number;
-  title: string;
-  author: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
+import { CartItem } from '../types'; // ایمپورت CartItem از types.ts
 
 interface CartContextType {
   cartItems: CartItem[];

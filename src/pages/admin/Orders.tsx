@@ -180,7 +180,7 @@ const initialOrders: Order[] = [
     total: "۴۲۰،۰۰۰ تومان",
     status: "shipped",
     items: [
-      { title: "کتابخانه نیمه‌شب", quantity: 1, price: "۱۴۰،۰۰۰ تومان" },
+      { title: "کتابخانه نیمه‌شب", quantity: 1, price: "۱۴۴،۰۰۰ تومان" },
       { title: "انسان در جستجوی معنا", quantity: 2, price: "۲۸۰،۰۰۰ تومان" }
     ]
   },
@@ -386,27 +386,27 @@ const CustomModal: React.FC<CustomModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-4">
-          <AlertCircle className="h-6 w-6" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="w-full max-w-md p-6 mx-4 bg-white rounded-lg dark:bg-gray-800">
+        <div className="flex items-center gap-3 mb-4 text-red-600 dark:text-red-400">
+          <AlertCircle className="w-6 h-6" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
         </div>
-        <div className="text-gray-600 dark:text-gray-300 mb-6">
+        <div className="mb-6 text-gray-600 dark:text-gray-300">
           {message}
           {children}
         </div>
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-600 transition-colors rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             {cancelText || 'بستن'}
           </button>
           {onConfirm && (
             <button
               onClick={onConfirm}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-4 py-2 text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700"
             >
               {confirmText || 'تایید'}
             </button>
@@ -745,41 +745,45 @@ const AdminOrders: React.FC = () => {
 
       <div className={modalOpen ? "opacity-50 pointer-events-none" : ""}>
         <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">مدیریت سفارشات</h1>
             <button 
               onClick={handleGenerateInvoice}
-              className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
             >
-              <Plus className="h-5 w-5" />
+              <Plus className="w-5 h-5" />
               ایجاد فاکتور جدید
             </button>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="p-4 mb-6 bg-white rounded-lg shadow dark:bg-gray-800">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div className="relative">
-                <Search className="absolute right-3 top-3 text-gray-400 dark:text-gray-300" />
+                <Search className="absolute text-gray-400 right-3 top-3 dark:text-gray-300" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="جستجو در سفارشات..."
-                  className="w-full pr-10 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 pr-10 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 />
               </div>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="">همه وضعیت‌ها</option>
-                <option value="pending_payment">در انتظار پرداخت</option>
-                <option value="processing">در حال پردازش</option>
-                <option value="shipped">ارسال شده</option>
-                <option value="delivered">تحویل شده</option>
-                <option value="cancelled">لغو شده</option>
-              </select>
+              <div className="flex items-center gap-2">
+                <label htmlFor="status-filter" className="text-gray-900 dark:text-white">فیلتر وضعیت:</label>
+                <select
+                  id="status-filter"
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">همه وضعیت‌ها</option>
+                  <option value="pending_payment">در انتظار پرداخت</option>
+                  <option value="processing">در حال پردازش</option>
+                  <option value="shipped">ارسال شده</option>
+                  <option value="delivered">تحویل شده</option>
+                  <option value="cancelled">لغو شده</option>
+                </select>
+              </div>
               <div className={datePickerClass}>
                 <DatePicker
                   value={startDate}
@@ -809,62 +813,62 @@ const AdminOrders: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
+          <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800">
             <table className="w-full table-fixed font-sans border-collapse min-w-[800px]">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                   <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('id')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       شماره سفارش
                       {sortConfig.key === 'id' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
                   <th className="w-[20%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('customerName')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       مشتری
                       {sortConfig.key === 'customerName' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
                   <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('date')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       تاریخ
                       {sortConfig.key === 'date' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
                   <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('total')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       مبلغ کل
                       {sortConfig.key === 'total' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
                   <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
                     <button 
                       onClick={() => handleSort('status')} 
-                      className="flex items-center justify-center gap-1 w-full text-center"
+                      className="flex items-center justify-center w-full gap-1 text-center"
                     >
                       وضعیت
                       {sortConfig.key === 'status' && (
-                        sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                        sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </th>
@@ -886,18 +890,22 @@ const AdminOrders: React.FC = () => {
                       </span>
                     </td>
                     <td className="w-[20%] py-3 px-2 text-center">
-                      <div className="flex gap-2 justify-center">
+                      <div className="flex justify-center gap-2">
                         <button
                           onClick={() => handleViewOrder(order)}
-                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                          aria-label={`مشاهده سفارش ${order.id}`}
+                          title={`مشاهده سفارش ${order.id}`}
+                          className="text-blue-600 transition-colors dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                         >
-                          <Eye className="h-5 w-5" />
+                          <Eye className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => handleDownloadInvoice(order)}
-                          className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+                          aria-label={`دانلود فاکتور سفارش ${order.id}`}
+                          title={`دانلود فاکتور سفارش ${order.id}`}
+                          className="text-gray-600 transition-colors dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
                         >
-                          <Download className="h-5 w-5" />
+                          <Download className="w-5 h-5" />
                         </button>
                       </div>
                     </td>
@@ -907,14 +915,15 @@ const AdminOrders: React.FC = () => {
             </table>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-0">
+          <div className="flex flex-col items-center justify-between p-4 mt-4 bg-white rounded-lg shadow sm:flex-row dark:bg-gray-800">
+            <div className="flex flex-col items-center gap-4 mb-4 sm:flex-row sm:mb-0">
               <div className="flex items-center gap-2">
-                <label className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
+                <label htmlFor="items-per-page" className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
                 <select
+                  id="items-per-page"
                   value={itemsPerPage}
                   onChange={handleItemsPerPageChange}
-                  className="py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
@@ -927,18 +936,20 @@ const AdminOrders: React.FC = () => {
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
               <div className="flex items-center gap-2">
                 <button
                   onClick={goToPreviousPage}
                   disabled={currentPage === 1}
+                  aria-label="صفحه قبلی"
+                  title="صفحه قبلی"
                   className={`p-2 rounded-lg transition-colors ${
                     currentPage === 1
                       ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                       : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronRight className="w-5 h-5" />
                 </button>
                 <div className="flex gap-1">
                   {getPageNumbers().map((page, index) => (
@@ -961,13 +972,15 @@ const AdminOrders: React.FC = () => {
                 <button
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages}
+                  aria-label="صفحه بعدی"
+                  title="صفحه بعدی"
                   className={`p-2 rounded-lg transition-colors ${
                     currentPage === totalPages
                       ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                       : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <ChevronLeft className="h-5 w-5" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -976,13 +989,13 @@ const AdminOrders: React.FC = () => {
                   value={goToPageInput}
                   onChange={(e) => setGoToPageInput(e.target.value)}
                   placeholder="شماره صفحه"
-                  className="w-24 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-24 px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   min="1"
                   max={totalPages}
                 />
                 <button
                   onClick={handleGoToPage}
-                  className="px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="px-3 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
                 >
                   برو
                 </button>
@@ -993,17 +1006,19 @@ const AdminOrders: React.FC = () => {
           {showScrollToTop && (
             <button
               onClick={scrollToTop}
-              className="fixed bottom-6 left-6 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-colors"
+              aria-label="برو به بالای صفحه"
+              title="برو به بالای صفحه"
+              className="fixed p-3 text-white transition-colors rounded-full shadow-lg bottom-6 left-6 bg-primary-600 hover:bg-primary-700"
             >
-              <ArrowUp className="h-6 w-6" />
+              <ArrowUp className="w-6 h-6" />
             </button>
           )}
         </div>
       </div>
 
       {showOrderDetails && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-2xl p-6 mx-4 bg-white rounded-lg dark:bg-gray-800">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">جزئیات سفارش {selectedOrder.id}</h3>
               <button
@@ -1025,31 +1040,31 @@ const AdminOrders: React.FC = () => {
                 </div>
               </div>
               <div>
-                <p className="text-gray-600 dark:text-gray-300 mb-2">اقلام سفارش</p>
-                <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
+                <p className="mb-2 text-gray-600 dark:text-gray-300">اقلام سفارش</p>
+                <div className="overflow-hidden border border-gray-200 rounded-lg dark:border-gray-600">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                        <th className="text-right py-2 px-4 text-gray-900 dark:text-white">عنوان</th>
-                        <th className="text-right py-2 px-4 text-gray-900 dark:text-white">تعداد</th>
-                        <th className="text-right py-2 px-4 text-gray-900 dark:text-white">قیمت</th>
+                      <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                        <th className="px-4 py-2 text-right text-gray-900 dark:text-white">عنوان</th>
+                        <th className="px-4 py-2 text-right text-gray-900 dark:text-white">تعداد</th>
+                        <th className="px-4 py-2 text-right text-gray-900 dark:text-white">قیمت</th>
                       </tr>
                     </thead>
                     <tbody>
                       {selectedOrder.items.map((item, index) => (
                         <tr key={index} className="border-b border-gray-200 dark:border-gray-600 last:border-b-0">
-                          <td className="py-2 px-4 text-gray-900 dark:text-white">{item.title}</td>
-                          <td className="py-2 px-4 text-gray-900 dark:text-white">{item.quantity}</td>
-                          <td className="py-2 px-4 text-gray-900 dark:text-white">{item.price}</td>
+                          <td className="px-4 py-2 text-gray-900 dark:text-white">{item.title}</td>
+                          <td className="px-4 py-2 text-gray-900 dark:text-white">{item.quantity}</td>
+                          <td className="px-4 py-2 text-gray-900 dark:text-white">{item.price}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               </div>
-              <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-600">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
                 <span className="text-gray-600 dark:text-gray-300">مبلغ کل</span>
-                <span className="font-bold text-lg text-gray-900 dark:text-white">{selectedOrder.total}</span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">{selectedOrder.total}</span>
               </div>
             </div>
           </div>
@@ -1071,33 +1086,38 @@ const AdminOrders: React.FC = () => {
             value={newInvoice.customerName}
             onChange={(e) => setNewInvoice({ ...newInvoice, customerName: e.target.value })}
             placeholder="نام مشتری"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
-          <DatePicker
-            value={newInvoice.date}
-            onChange={(date) => setNewInvoice({ ...newInvoice, date })}
-            locale="fa"
-            minimumDate={{ year: 1300, month: 1, day: 1 }}
-            maximumDate={{ year: 1500, month: 12, day: 29 }}
-            shouldHighlightWeekends
-            inputPlaceholder="انتخاب تاریخ"
-            wrapperClassName="w-full"
-            inputClassName="w-full py-2 px-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            disabled={showOrderDetails || messageModal.isOpen}
-          />
-          <select
-            value={newInvoice.status}
-            onChange={(e) => setNewInvoice({ ...newInvoice, status: e.target.value as Order['status'] })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="pending_payment">در انتظار پرداخت</option>
-            <option value="processing">در حال پردازش</option>
-            <option value="shipped">ارسال شده</option>
-            <option value="delivered">تحویل شده</option>
-            <option value="cancelled">لغو شده</option>
-          </select>
+          <div className={modalOpen ? "opacity-50 pointer-events-none" : ""}>
+            <DatePicker
+              value={newInvoice.date}
+              onChange={(date) => setNewInvoice({ ...newInvoice, date })}
+              locale="fa"
+              minimumDate={{ year: 1300, month: 1, day: 1 }}
+              maximumDate={{ year: 1500, month: 12, day: 29 }}
+              shouldHighlightWeekends
+              inputPlaceholder="انتخاب تاریخ"
+              wrapperClassName="w-full"
+              inputClassName="w-full py-2 px-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="invoice-status" className="text-gray-600 dark:text-gray-300">وضعیت:</label>
+            <select
+              id="invoice-status"
+              value={newInvoice.status}
+              onChange={(e) => setNewInvoice({ ...newInvoice, status: e.target.value as Order['status'] })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="pending_payment">در انتظار پرداخت</option>
+              <option value="processing">در حال پردازش</option>
+              <option value="shipped">ارسال شده</option>
+              <option value="delivered">تحویل شده</option>
+              <option value="cancelled">لغو شده</option>
+            </select>
+          </div>
           <div>
-            <p className="text-gray-600 dark:text-gray-300 mb-2">اقلام فاکتور</p>
+            <p className="mb-2 text-gray-600 dark:text-gray-300">اقلام فاکتور</p>
             {newInvoice.items.map((item, index) => (
               <div key={index} className="flex gap-2 mb-2">
                 <input
@@ -1105,7 +1125,7 @@ const AdminOrders: React.FC = () => {
                   value={item.title}
                   onChange={(e) => updateItemField(index, 'title', e.target.value)}
                   placeholder="عنوان"
-                  className="w-1/3 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-1/3 p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
                 <input
                   type="number"
@@ -1113,7 +1133,7 @@ const AdminOrders: React.FC = () => {
                   onChange={(e) => updateItemField(index, 'quantity', parseInt(e.target.value) || 1)}
                   min="1"
                   placeholder="تعداد"
-                  className="w-1/3 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-1/3 p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
                 <input
                   type="text"
@@ -1123,7 +1143,7 @@ const AdminOrders: React.FC = () => {
                     updateItemField(index, 'price', value);
                   }}
                   placeholder="قیمت (فقط عدد)"
-                  className="w-1/3 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-1/3 p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
               </div>
             ))}
