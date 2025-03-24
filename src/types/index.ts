@@ -1,4 +1,3 @@
-
 export interface Book {
   id: number;
   title: string;
@@ -9,10 +8,9 @@ export interface Book {
   format: 'print' | 'ebook' | 'both';
   description: string;
   category: string;
-  createdAt?: string;
-  quantity?: number;
+  quantity: number;
+  createdAt?: string; 
 }
-
 export interface CartItem {
   id: number;
   title: string;

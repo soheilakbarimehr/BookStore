@@ -102,27 +102,27 @@ const CustomModal: React.FC<CustomModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-4">
-          <AlertCircle className="h-6 w-6" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="w-full max-w-md p-6 mx-4 bg-white rounded-lg dark:bg-gray-800">
+        <div className="flex items-center gap-3 mb-4 text-red-600 dark:text-red-400">
+          <AlertCircle className="w-6 h-6" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
         </div>
-        <div className="text-gray-600 dark:text-gray-300 mb-6">
+        <div className="mb-6 text-gray-600 dark:text-gray-300">
           {message}
           {children}
         </div>
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-600 transition-colors rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             {cancelText || 'بستن'}
           </button>
           {onConfirm && (
             <button
               onClick={onConfirm}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-4 py-2 text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700"
             >
               {confirmText || 'تایید'}
             </button>
@@ -189,43 +189,41 @@ const AdminBooks: React.FC = () => {
   };
 
   const convertPriceToNumber = (priceString: string): number => {
-    // Remove non-numeric characters and convert Persian numbers to English
     const numericString = priceString.replace(/[^۰-۹0-9]/g, '')
       .replace(/[۰-۹]/g, d => String.fromCharCode(d.charCodeAt(0) - '۰'.charCodeAt(0) + '0'.charCodeAt(0)));
     return parseInt(numericString, 10);
   };
 
- const sortBooks = (books: Book[]) => {
-  if (!sortConfig.key) return books;
+  const sortBooks = (books: Book[]) => {
+    if (!sortConfig.key) return books;
 
-  const sortedBooks = [...books];
-  sortedBooks.sort((a, b) => {
-    if (sortConfig.key === 'price') {
-      const priceA = convertPriceToNumber(a.price);
-      const priceB = convertPriceToNumber(b.price);
-      return sortConfig.direction === 'asc' ? priceA - priceB : priceB - priceA;
-    }
+    const sortedBooks = [...books];
+    sortedBooks.sort((a, b) => {
+      if (sortConfig.key === 'price') {
+        const priceA = convertPriceToNumber(a.price);
+        const priceB = convertPriceToNumber(b.price);
+        return sortConfig.direction === 'asc' ? priceA - priceB : priceB - priceA;
+      }
 
-    const aValue = a[sortConfig.key!];
-    const bValue = b[sortConfig.key!];
+      const aValue = a[sortConfig.key!];
+      const bValue = b[sortConfig.key!];
 
-    // برای مقادیر عددی (مثل stock)
-    if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-    }
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+      }
 
-    // برای مقادیر رشته‌ای (مثل title, author, status)
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortConfig.direction === 'asc'
-        ? aValue.localeCompare(bValue, 'fa')
-        : bValue.localeCompare(aValue, 'fa');
-    }
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue, 'fa')
+          : bValue.localeCompare(aValue, 'fa');
+      }
 
-    return 0;
-  });
+      return 0;
+    });
 
-  return sortedBooks;
-};
+    return sortedBooks;
+  };
+
   const handleSort = (key: keyof Book) => {
     setSortConfig((prev) => ({
       key,
@@ -445,163 +443,181 @@ const AdminBooks: React.FC = () => {
       </Helmet>
 
       <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">مدیریت کتاب‌ها</h1>
           <button 
             onClick={handleAddBook}
-            className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="w-5 h-5" />
             افزودن کتاب جدید
           </button>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 mb-6 bg-white rounded-lg shadow dark:bg-gray-800">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="relative">
-              <Search className="absolute right-3 top-3 text-gray-400 dark:text-gray-300" />
+              <Search className="absolute text-gray-400 right-3 top-3 dark:text-gray-300" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="جستجو در کتاب‌ها..."
-                className="w-full pr-10 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 pr-10 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
-            <select 
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              <option value="">همه دسته‌بندی‌ها</option>
-              <option value="رمان">رمان</option>
-              <option value="علمی">علمی</option>
-            </select>
-            <select
-              value={selectedFormat}
-              onChange={(e) => setSelectedFormat(e.target.value)}
-              className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              <option value="">همه فرمت‌ها</option>
-              <option value="physical">چاپی</option>
-              <option value="digital">الکترونیک</option>
-            </select>
+            <div className="relative">
+              <label htmlFor="category-filter" className="sr-only">دسته‌بندی</label>
+              <select 
+                id="category-filter"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">همه دسته‌بندی‌ها</option>
+                <option value="رمان">رمان</option>
+                <option value="علمی">علمی</option>
+              </select>
+            </div>
+            <div className="relative">
+              <label htmlFor="format-filter" className="sr-only">فرمت</label>
+              <select
+                id="format-filter"
+                value={selectedFormat}
+                onChange={(e) => setSelectedFormat(e.target.value)}
+                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">همه فرمت‌ها</option>
+                <option value="physical">چاپی</option>
+                <option value="digital">الکترونیک</option>
+              </select>
+            </div>
           </div>
         </div>
-<div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
-  <table className="w-full table-fixed font-sans border-collapse min-w-[800px]">
-    <thead>
-      <tr className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-        <th className="w-[22%] py-3 px-2 text-gray-900 dark:text-white text-center">
-          <button 
-            onClick={() => handleSort('title')} 
-            className="flex items-center justify-center gap-1 w-full text-center"
-          >
-            عنوان
-            {sortConfig.key === 'title' && (
-              sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-        </th>
-        <th className="w-[22%] py-3 px-2 text-gray-900 dark:text-white text-center">
-          <button 
-            onClick={() => handleSort('author')} 
-            className="flex items-center justify-center gap-1 w-full text-center"
-          >
-            نویسنده
-            {sortConfig.key === 'author' && (
-              sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-        </th>
-        <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
-          <button 
-            onClick={() => handleSort('price')} 
-            className="flex items-center justify-center gap-1 w-full text-center"
-          >
-            قیمت
-            {sortConfig.key === 'price' && (
-              sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-        </th>
-        <th className="w-[12%] py-3 px-2 text-gray-900 dark:text-white text-center">
-          <button 
-            onClick={() => handleSort('stock')} 
-            className="flex items-center justify-center gap-1 w-full text-center"
-          >
-            موجودی
-            {sortConfig.key === 'stock' && (
-              sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-        </th>
-        <th className="w-[12%] py-3 px-2 text-gray-900 dark:text-white text-center">
-          <button 
-            onClick={() => handleSort('status')} 
-            className="flex items-center justify-center gap-1 w-full text-center"
-          >
-            وضعیت
-            {sortConfig.key === 'status' && (
-              sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-        </th>
-        <th className="w-[17%] py-3 px-2 text-gray-900 dark:text-white text-center">
-          عملیات
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <AnimatePresence>
-        {currentBooks.map((book) => (
-          <motion.tr
-            key={book.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <td className="w-[22%] py-3 px-2 text-gray-900 dark:text-white text-center truncate">{book.title}</td>
-            <td className="w-[22%] py-3 px-2 text-gray-900 dark:text-white text-center truncate">{book.author}</td>
-            <td className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">{book.price}</td>
-            <td className="w-[12%] py-3 px-2 text-gray-900 dark:text-white text-center">{book.stock}</td>
-            <td className="w-[12%] py-3 px-2 text-center">
-              <span className={`${getStatusBadgeClass(book.status)} px-2 py-1 rounded-full text-sm`}>
-                {getStatusText(book.status)}
-              </span>
-            </td>
-            <td className="w-[17%] py-3 px-2 text-center">
-              <div className="flex gap-2 justify-center">
-                <button 
-                  onClick={() => handleEditBook(book)}
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-                >
-                  <Edit className="h-5 w-5" />
-                </button>
-                <button 
-                  onClick={() => handleDeleteBook(book)}
-                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
-                >
-                  <Trash2 className="h-5 w-5" />
-                </button>
-              </div>
-            </td>
-          </motion.tr>
-        ))}
-      </AnimatePresence>
-    </tbody>
-  </table>
-</div>
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-0">
+
+        <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800">
+          <table className="w-full table-fixed font-sans border-collapse min-w-[800px]">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                <th className="w-[22%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                  <button 
+                    onClick={() => handleSort('title')} 
+                    className="flex items-center justify-center w-full gap-1 text-center"
+                    aria-label={`مرتب‌سازی بر اساس عنوان (${sortConfig.key === 'title' && sortConfig.direction === 'asc' ? 'صعودی' : 'نزولی'})`}
+                  >
+                    عنوان
+                    {sortConfig.key === 'title' && (
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                </th>
+                <th className="w-[22%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                  <button 
+                    onClick={() => handleSort('author')} 
+                    className="flex items-center justify-center w-full gap-1 text-center"
+                    aria-label={`مرتب‌سازی بر اساس نویسنده (${sortConfig.key === 'author' && sortConfig.direction === 'asc' ? 'صعودی' : 'نزولی'})`}
+                  >
+                    نویسنده
+                    {sortConfig.key === 'author' && (
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                </th>
+                <th className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                  <button 
+                    onClick={() => handleSort('price')} 
+                    className="flex items-center justify-center w-full gap-1 text-center"
+                    aria-label={`مرتب‌سازی بر اساس قیمت (${sortConfig.key === 'price' && sortConfig.direction === 'asc' ? 'صعودی' : 'نزولی'})`}
+                  >
+                    قیمت
+                    {sortConfig.key === 'price' && (
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                </th>
+                <th className="w-[12%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                  <button 
+                    onClick={() => handleSort('stock')} 
+                    className="flex items-center justify-center w-full gap-1 text-center"
+                    aria-label={`مرتب‌سازی بر اساس موجودی (${sortConfig.key === 'stock' && sortConfig.direction === 'asc' ? 'صعودی' : 'نزولی'})`}
+                  >
+                    موجودی
+                    {sortConfig.key === 'stock' && (
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                </th>
+                <th className="w-[12%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                  <button 
+                    onClick={() => handleSort('status')} 
+                    className="flex items-center justify-center w-full gap-1 text-center"
+                    aria-label={`مرتب‌سازی بر اساس وضعیت (${sortConfig.key === 'status' && sortConfig.direction === 'asc' ? 'صعودی' : 'نزولی'})`}
+                  >
+                    وضعیت
+                    {sortConfig.key === 'status' && (
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+                    )}
+                  </button>
+                </th>
+                <th className="w-[17%] py-3 px-2 text-gray-900 dark:text-white text-center">
+                  عملیات
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <AnimatePresence>
+                {currentBooks.map((book) => (
+                  <motion.tr
+                    key={book.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <td className="w-[22%] py-3 px-2 text-gray-900 dark:text-white text-center truncate">{book.title}</td>
+                    <td className="w-[22%] py-3 px-2 text-gray-900 dark:text-white text-center truncate">{book.author}</td>
+                    <td className="w-[15%] py-3 px-2 text-gray-900 dark:text-white text-center">{book.price}</td>
+                    <td className="w-[12%] py-3 px-2 text-gray-900 dark:text-white text-center">{book.stock}</td>
+                    <td className="w-[12%] py-3 px-2 text-center">
+                      <span className={`${getStatusBadgeClass(book.status)} px-2 py-1 rounded-full text-sm`}>
+                        {getStatusText(book.status)}
+                      </span>
+                    </td>
+                    <td className="w-[17%] py-3 px-2 text-center">
+                      <div className="flex justify-center gap-2">
+                        <button 
+                          onClick={() => handleEditBook(book)}
+                          className="text-blue-600 transition-colors dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                          aria-label={`ویرایش کتاب ${book.title}`}
+                        >
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteBook(book)}
+                          className="text-red-600 transition-colors dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                          aria-label={`حذف کتاب ${book.title}`}
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex flex-col items-center justify-between p-4 mt-4 bg-white rounded-lg shadow sm:flex-row dark:bg-gray-800">
+          <div className="flex flex-col items-center gap-4 mb-4 sm:flex-row sm:mb-0">
             <div className="flex items-center gap-2">
-              <label className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
+              <label htmlFor="items-per-page" className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
               <select
+                id="items-per-page"
                 value={itemsPerPage}
                 onChange={handleItemsPerPageChange}
-                className="py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -614,7 +630,7 @@ const AdminBooks: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex flex-col items-center gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
               <button
                 onClick={goToPreviousPage}
@@ -624,8 +640,9 @@ const AdminBooks: React.FC = () => {
                     ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
+                aria-label="صفحه قبلی"
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="w-5 h-5" />
               </button>
               <div className="flex gap-1">
                 {getPageNumbers().map((page, index) => (
@@ -653,8 +670,9 @@ const AdminBooks: React.FC = () => {
                     ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
+                aria-label="صفحه بعدی"
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
             </div>
             <div className="flex items-center gap-2">
@@ -663,13 +681,13 @@ const AdminBooks: React.FC = () => {
                 value={goToPageInput}
                 onChange={(e) => setGoToPageInput(e.target.value)}
                 placeholder="شماره صفحه"
-                className="w-24 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-24 px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 min="1"
                 max={totalPages}
               />
               <button
                 onClick={handleGoToPage}
-                className="px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="px-3 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
               >
                 برو
               </button>
@@ -680,9 +698,10 @@ const AdminBooks: React.FC = () => {
         {showScrollToTop && (
           <button
             onClick={scrollToTop}
-            className="fixed bottom-6 left-6 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-colors"
+            className="fixed p-3 text-white transition-colors rounded-full shadow-lg bottom-6 left-6 bg-primary-600 hover:bg-primary-700"
+            aria-label="رفتن به بالای صفحه"
           >
-            <ArrowUp className="h-6 w-6" />
+            <ArrowUp className="w-6 h-6" />
           </button>
         )}
       </div>
@@ -696,20 +715,20 @@ const AdminBooks: React.FC = () => {
         confirmText="ثبت"
         cancelText="انصراف"
       >
-        <div className="space-y-4 mt-2">
+        <div className="mt-2 space-y-4">
           <input
             type="text"
             value={newBookForm.title || ''}
             onChange={(e) => setNewBookForm({ ...newBookForm, title: e.target.value })}
             placeholder="عنوان"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
           <input
             type="text"
             value={newBookForm.author || ''}
             onChange={(e) => setNewBookForm({ ...newBookForm, author: e.target.value })}
             placeholder="نویسنده"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
           <div className="flex items-center gap-2">
             <span className="text-gray-900 dark:text-white">تومان</span>
@@ -721,7 +740,7 @@ const AdminBooks: React.FC = () => {
                 setNewBookForm({ ...newBookForm, price: value });
               }}
               placeholder="قیمت (فقط عدد)"
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             />
           </div>
           <input
@@ -730,33 +749,45 @@ const AdminBooks: React.FC = () => {
             onChange={(e) => setNewBookForm({ ...newBookForm, stock: parseInt(e.target.value) || 0 })}
             min="0"
             placeholder="موجودی"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
-          <select
-            value={newBookForm.status || 'available'}
-            onChange={(e) => setNewBookForm({ ...newBookForm, status: e.target.value as Book['status'] })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="available">موجود</option>
-            <option value="unavailable">ناموجود</option>
-            <option value="preorder">پیش‌فروش</option>
-          </select>
-          <select
-            value={newBookForm.category || 'رمان'}
-            onChange={(e) => setNewBookForm({ ...newBookForm, category: e.target.value })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="رمان">رمان</option>
-            <option value="علمی">علمی</option>
-          </select>
-          <select
-            value={newBookForm.format || 'physical'}
-            onChange={(e) => setNewBookForm({ ...newBookForm, format: e.target.value as Book['format'] })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="physical">چاپی</option>
-            <option value="digital">الکترونیک</option>
-          </select>
+          <div className="relative">
+            <label htmlFor="add-status" className="sr-only">وضعیت</label>
+            <select
+              id="add-status"
+              value={newBookForm.status || 'available'}
+              onChange={(e) => setNewBookForm({ ...newBookForm, status: e.target.value as Book['status'] })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="available">موجود</option>
+              <option value="unavailable">ناموجود</option>
+              <option value="preorder">پیش‌فروش</option>
+            </select>
+          </div>
+          <div className="relative">
+            <label htmlFor="add-category" className="sr-only">دسته‌بندی</label>
+            <select
+              id="add-category"
+              value={newBookForm.category || 'رمان'}
+              onChange={(e) => setNewBookForm({ ...newBookForm, category: e.target.value })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="رمان">رمان</option>
+              <option value="علمی">علمی</option>
+            </select>
+          </div>
+          <div className="relative">
+            <label htmlFor="add-format" className="sr-only">فرمت</label>
+            <select
+              id="add-format"
+              value={newBookForm.format || 'physical'}
+              onChange={(e) => setNewBookForm({ ...newBookForm, format: e.target.value as Book['format'] })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="physical">چاپی</option>
+              <option value="digital">الکترونیک</option>
+            </select>
+          </div>
         </div>
       </CustomModal>
 
@@ -779,20 +810,20 @@ const AdminBooks: React.FC = () => {
         confirmText="ثبت"
         cancelText="انصراف"
       >
-        <div className="space-y-4 mt-2">
+        <div className="mt-2 space-y-4">
           <input
             type="text"
             value={editForm.title || ''}
             onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
             placeholder="عنوان"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
           <input
             type="text"
             value={editForm.author || ''}
             onChange={(e) => setEditForm({ ...editForm, author: e.target.value })}
             placeholder="نویسنده"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
           <div className="flex items-center gap-2">
             <span className="text-gray-900 dark:text-white">تومان</span>
@@ -804,7 +835,7 @@ const AdminBooks: React.FC = () => {
                 setEditForm({ ...editForm, price: value });
               }}
               placeholder="قیمت (فقط عدد)"
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             />
           </div>
           <input
@@ -813,33 +844,45 @@ const AdminBooks: React.FC = () => {
             onChange={(e) => setEditForm({ ...editForm, stock: parseInt(e.target.value) || 0 })}
             min="0"
             placeholder="موجودی"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
-          <select
-            value={editForm.status || ''}
-            onChange={(e) => setEditForm({ ...editForm, status: e.target.value as Book['status'] })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="available">موجود</option>
-            <option value="unavailable">ناموجود</option>
-            <option value="preorder">پیش‌فروش</option>
-          </select>
-          <select
-            value={editForm.category || ''}
-            onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="رمان">رمان</option>
-            <option value="علمی">علمی</option>
-          </select>
-          <select
-            value={editForm.format || ''}
-            onChange={(e) => setEditForm({ ...editForm, format: e.target.value as Book['format'] })}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          >
-            <option value="physical">چاپی</option>
-            <option value="digital">الکترونیک</option>
-          </select>
+          <div className="relative">
+            <label htmlFor="edit-status" className="sr-only">وضعیت</label>
+            <select
+              id="edit-status"
+              value={editForm.status || ''}
+              onChange={(e) => setEditForm({ ...editForm, status: e.target.value as Book['status'] })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="available">موجود</option>
+              <option value="unavailable">ناموجود</option>
+              <option value="preorder">پیش‌فروش</option>
+            </select>
+          </div>
+          <div className="relative">
+            <label htmlFor="edit-category" className="sr-only">دسته‌بندی</label>
+            <select
+              id="edit-category"
+              value={editForm.category || ''}
+              onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="رمان">رمان</option>
+              <option value="علمی">علمی</option>
+            </select>
+          </div>
+          <div className="relative">
+            <label htmlFor="edit-format" className="sr-only">فرمت</label>
+            <select
+              id="edit-format"
+              value={editForm.format || ''}
+              onChange={(e) => setEditForm({ ...editForm, format: e.target.value as Book['format'] })}
+              className="w-full p-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="physical">چاپی</option>
+              <option value="digital">الکترونیک</option>
+            </select>
+          </div>
         </div>
       </CustomModal>
 

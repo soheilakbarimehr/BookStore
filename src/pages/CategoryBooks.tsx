@@ -1,21 +1,33 @@
+// src/pages/CategoryBooks.tsx
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Star, Search, Filter, BookOpen, Download, ChevronLeft, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Book } from '../types';
+import { useBooksContent } from '../context/BooksContentContext';
+import { useCategories } from '../context/CategoriesContentContext';
 
-interface CategoryBooksProps {
-  books: Book[];
-}
-
-const CategoryBooks: React.FC<CategoryBooksProps> = ({ books }) => {
+const CategoryBooks: React.FC = () => {
+  const { books } = useBooksContent();
+  const { categories } = useCategories();
   const { category } = useParams<{ category: string }>();
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortOption, setSortOption] = useState<'newest' | 'price-asc' | 'price-desc' | 'popular'>('newest');
-  const [formatFilter, setFormatFilter] = useState<'all' | 'print' | 'ebook'>('all');
+  const [sortOption, setSortOption] = useState<string>('newest');
+  const [formatFilter, setFormatFilter] = useState<string>('all');
   const { addToCart } = useCart();
+
+  // بررسی اینکه دسته‌بندی وجود داره یا نه
+  if (!categories.some((cat) => cat.title === category)) {
+    return (
+      <div className="py-16 text-center text-gray-500 dark:text-gray-400">
+        <p>دسته‌بندی مورد نظر یافت نشد.</p>
+        <Link to="/categories" className="text-primary-600 dark:text-primary-400 hover:underline">
+          بازگشت به دسته‌بندی‌ها
+        </Link>
+      </div>
+    );
+  }
 
   const filteredBooks = books
     .filter((book) => book.category === category)
@@ -64,6 +76,7 @@ const CategoryBooks: React.FC<CategoryBooksProps> = ({ books }) => {
             <div className="relative">
               <Search className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 right-4 top-1/2" />
               <input
+                id="search-books"
                 type="text"
                 placeholder="جستجو در کتاب‌ها..."
                 value={searchQuery}
@@ -75,10 +88,9 @@ const CategoryBooks: React.FC<CategoryBooksProps> = ({ books }) => {
             <div className="relative">
               <Filter className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 right-4 top-1/2" />
               <select
+                id="sort-books"
                 value={sortOption}
-                onChange={(e) =>
-                  setSortOption(e.target.value as 'newest' | 'price-asc' | 'price-desc' | 'popular')
-                }
+                onChange={(e) => setSortOption(e.target.value)}
                 aria-label="مرتب‌سازی کتاب‌ها"
                 className="w-full px-4 py-2 pr-12 text-gray-900 bg-white border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
@@ -91,8 +103,9 @@ const CategoryBooks: React.FC<CategoryBooksProps> = ({ books }) => {
             <div className="relative">
               <BookOpen className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 right-4 top-1/2" />
               <select
+                id="format-filter"
                 value={formatFilter}
-                onChange={(e) => setFormatFilter(e.target.value as 'all' | 'print' | 'ebook')}
+                onChange={(e) => setFormatFilter(e.target.value)}
                 aria-label="فیلتر بر اساس فرمت"
                 className="w-full px-4 py-2 pr-12 text-gray-900 bg-white border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >

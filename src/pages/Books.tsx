@@ -1,24 +1,25 @@
+// src/pages/Books.tsx
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Star, Search, Filter, BookOpen, Download, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { Book } from '../types';
+import { useBooksContent } from '../context/BooksContentContext';
 
-interface BooksProps {
-  books: Book[];
-}
-
-const Books: React.FC<BooksProps> = ({ books }) => {
-  const [selectedFormat, setSelectedFormat] = useState<'all' | 'print' | 'ebook'>('all');
-  const [selectedSort, setSelectedSort] = useState<'newest' | 'popular' | 'price-asc' | 'price-desc'>('newest');
+const Books: React.FC = () => {
+  const { books, categories, featuredBookIds, defaultSort, defaultBooksPerPage } = useBooksContent();
+  const [selectedFormat, setSelectedFormat] = useState<string>('all');
+  const [selectedSort, setSelectedSort] = useState<string>(defaultSort);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [booksPerPage, setBooksPerPage] = useState(8);
+  const [booksPerPage, setBooksPerPage] = useState<number>(defaultBooksPerPage);
 
   const { addToCart } = useCart();
+
+  // کتاب‌های ویژه
+  const featuredBooks = books.filter((book) => featuredBookIds.includes(book.id));
 
   const filteredBooks = books
     .filter(
@@ -65,6 +66,78 @@ const Books: React.FC<BooksProps> = ({ books }) => {
       </Helmet>
 
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        {/* کتاب‌های ویژه */}
+        {featuredBooks.length > 0 && (
+          <section className="mb-12">
+            <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">کتاب‌های ویژه</h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {featuredBooks.map((book) => (
+                <motion.div
+                  key={book.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}
+                  className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden relative min-h-[400px]"
+                >
+                  <Link to={`/books/${book.id}`} className="block">
+                    <div className="relative">
+                      <img
+                        src={book.image}
+                        alt={book.title}
+                        className="object-cover w-full h-48"
+                        loading="lazy"
+                      />
+                      <div className="absolute flex space-x-2 top-2 left-2 rtl:space-x-reverse">
+                        {(book.format === 'ebook' || book.format === 'both') && (
+                          <span className="flex items-center px-2 py-1 text-sm text-white rounded-md bg-primary-500">
+                            <Download className="w-4 h-4 ml-1" />
+                            الکترونیک
+                          </span>
+                        )}
+                        {(book.format === 'print' || book.format === 'both') && (
+                          <span className="flex items-center px-2 py-1 text-sm text-white bg-gray-700 rounded-md">
+                            <BookOpen className="w-4 h-4 ml-1" />
+                            چاپی
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-4 flex flex-col h-[200px]">
+                      <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                        {book.title}
+                      </h3>
+                      <p className="mb-2 text-gray-600 dark:text-gray-300">{book.author}</p>
+                      <p className="flex-1 mb-4 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                        {book.description || 'توضیحات در دسترس نیست.'}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-primary-600 dark:text-primary-400">
+                          {book.price.toLocaleString('fa-IR')} تومان
+                        </span>
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <span className="mr-1 text-gray-600 dark:text-gray-300">{book.rating}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => addToCart({ ...book, quantity: 1 })}
+                    className="absolute flex items-center justify-center gap-2 py-2 text-white transition-colors rounded-md bottom-4 left-4 right-4 bg-primary-600 hover:bg-primary-700"
+                    aria-label={`افزودن ${book.title} به سبد خرید`}
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    اضافه به سبد
+                  </motion.button>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* فیلترها و لیست کتاب‌ها */}
         <div className="p-6 mb-8 bg-white rounded-lg shadow-lg dark:bg-gray-900">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
             <div className="relative">
@@ -86,19 +159,18 @@ const Books: React.FC<BooksProps> = ({ books }) => {
                 className="w-full px-4 py-2 pr-12 text-gray-900 bg-white border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="all">همه دسته‌بندی‌ها</option>
-                <option value="ادبیات داستانی">ادبیات داستانی</option>
-                <option value="علمی-تخیلی">علمی-تخیلی</option>
-                <option value="تاریخی">تاریخی</option>
-                <option value="روانشناسی">روانشناسی</option>
-                <option value="کودکان">کودکان</option>
-                <option value="شعر">شعر</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="relative">
               <BookOpen className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 right-4 top-1/2" />
               <select
                 value={selectedFormat}
-                onChange={(e) => setSelectedFormat(e.target.value as 'all' | 'print' | 'ebook')}
+                onChange={(e) => setSelectedFormat(e.target.value)}
                 aria-label="فیلتر فرمت"
                 className="w-full px-4 py-2 pr-12 text-gray-900 bg-white border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
@@ -111,9 +183,7 @@ const Books: React.FC<BooksProps> = ({ books }) => {
               <Filter className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 right-4 top-1/2" />
               <select
                 value={selectedSort}
-                onChange={(e) =>
-                  setSelectedSort(e.target.value as 'newest' | 'popular' | 'price-asc' | 'price-desc')
-                }
+                onChange={(e) => setSelectedSort(e.target.value)}
                 aria-label="مرتب‌سازی"
                 className="w-full px-4 py-2 pr-12 text-gray-900 bg-white border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
@@ -210,10 +280,11 @@ const Books: React.FC<BooksProps> = ({ books }) => {
                     aria-label="تعداد در هر صفحه"
                     className="px-2 py-1 text-gray-900 bg-white border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={50}>50</option>
+                    {[5, 8, 10, 20].map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="flex items-center gap-2">

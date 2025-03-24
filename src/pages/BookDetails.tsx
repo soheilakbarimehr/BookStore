@@ -1,16 +1,14 @@
+// src/pages/BookDetails.tsx
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Star, BookOpen, Download, ShoppingCart, ChevronLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Book } from '../types';
+import { useBooksContent } from '../context/BooksContentContext';
 
-interface BookDetailsProps {
-  books: Book[];
-}
-
-const BookDetails: React.FC<BookDetailsProps> = ({ books }) => {
+const BookDetails: React.FC = () => {
+  const { books } = useBooksContent(); // استفاده از Context به جای پراپس
   const { id } = useParams<{ id: string }>();
   const { addToCart } = useCart();
 
@@ -24,10 +22,9 @@ const BookDetails: React.FC<BookDetailsProps> = ({ books }) => {
     );
   }
 
-  // فیلتر کردن کتاب‌های مشابه (کتاب‌هایی که در همان دسته‌بندی هستند، به جز کتاب فعلی)
   const similarBooks = books
     .filter((b) => b.category === book.category && b.id !== book.id)
-    .slice(0, 4); // محدود کردن به 4 کتاب مشابه
+    .slice(0, 4);
 
   return (
     <>
@@ -37,7 +34,6 @@ const BookDetails: React.FC<BookDetailsProps> = ({ books }) => {
       </Helmet>
 
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
         <nav className="flex items-center mb-6 text-sm text-gray-500 dark:text-gray-400">
           <Link to="/" className="text-primary-600 dark:text-primary-400 hover:underline">
             صفحه اصلی
@@ -50,7 +46,6 @@ const BookDetails: React.FC<BookDetailsProps> = ({ books }) => {
           <span>{book.title}</span>
         </nav>
 
-        {/* جزئیات کتاب */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -112,7 +107,6 @@ const BookDetails: React.FC<BookDetailsProps> = ({ books }) => {
           </motion.div>
         </div>
 
-        {/* کتاب‌های مشابه */}
         {similarBooks.length > 0 && (
           <div className="mt-12">
             <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">کتاب‌های مشابه</h2>

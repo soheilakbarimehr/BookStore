@@ -10,8 +10,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { useHomeContent } from '../context/HomeContentContext';
+import { useBooksContent } from '../context/BooksContentContext'; // اضافه کردن
 import { useCart } from '../context/CartContext';
-import { Book } from '../types';
 
 // تعریف تایپ CartItem (برای هماهنگی با CartContext)
 interface CartItem {
@@ -45,22 +45,18 @@ interface Section {
   visible: boolean;
 }
 
-interface HomeProps {
-  books: Book[];
-  isLoading?: boolean;
-  error?: string | null;
-}
-
-const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) => {
+const Home: React.FC = () => {
   const { content } = useHomeContent();
+  const { books } = useBooksContent(); // گرفتن کتاب‌ها از Context
   const { addToCart } = useCart();
 
   const homeContent = content.pages['home'] || { slider: [], sections: [] };
 
+  // مرتب‌سازی کتاب‌ها برای جدیدترین‌ها (latestBooks)
   const latestBooks = [...books]
     .sort((a, b) => {
-      if (!a.createdAt || !b.createdAt) return 0;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      // اگر createdAt وجود نداشته باشه، از id برای مرتب‌سازی استفاده می‌کنیم
+      return b.id - a.id;
     })
     .slice(0, 4);
 
@@ -82,7 +78,7 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
   };
 
   // تابع برای تبدیل Book به CartItem
-  const convertBookToCartItem = (book: Book): CartItem => ({
+  const convertBookToCartItem = (book: typeof books[0]): CartItem => ({
     id: book.id,
     title: book.title,
     author: book.author,
@@ -90,32 +86,6 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
     image: book.image,
     quantity: 1, // مقدار پیش‌فرض برای quantity
   });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1 }}
-          className="w-12 h-12 border-4 rounded-full border-t-primary-600"
-        />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="py-16 text-center text-red-500">
-        <p>خطایی رخ داده است: {error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 mt-4 text-white rounded-full bg-primary-600"
-        >
-          تلاش دوباره
-        </button>
-      </div>
-    );
-  }
 
   const orderedSections = [
     ...homeContent.sections.filter((s: Section) => s.visible && s.type === 'features'),
@@ -227,7 +197,7 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                     variants={containerVariants}
                     className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                   >
-                    {latestBooks.map((book: Book) => (
+                    {latestBooks.map((book) => (
                       <motion.div
                         key={book.id}
                         variants={itemVariants}
@@ -269,7 +239,7 @@ const Home: React.FC<HomeProps> = ({ books, isLoading = false, error = null }) =
                     variants={containerVariants}
                     className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
                   >
-                    {featuredBooks.map((book: Book) => (
+                    {featuredBooks.map((book) => (
                       <motion.div
                         key={book.id}
                         variants={itemVariants}
