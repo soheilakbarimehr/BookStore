@@ -26,7 +26,6 @@ const CategoriesSettings: React.FC = () => {
   console.log('Icon List:', iconList);
   console.log('Show Icon Picker:', showIconPicker);
 
-
   const openAddModal = () => {
     setNewCategory({
       id: localCategories.length ? Math.max(...localCategories.map((c) => c.id)) + 1 : 1,
@@ -184,6 +183,7 @@ const CategoriesSettings: React.FC = () => {
               type="button"
               onClick={openAddModal}
               className="flex items-center gap-2 px-4 py-2 mb-4 text-white rounded-lg bg-primary-600 hover:bg-primary-700"
+              aria-label="افزودن دسته‌بندی جدید"
             >
               <Plus className="w-5 h-5" />
               افزودن دسته‌بندی جدید
@@ -228,6 +228,7 @@ const CategoriesSettings: React.FC = () => {
                             type="button"
                             onClick={() => setShowIconPicker(category.id)}
                             className="flex items-center gap-2 px-4 py-2 text-gray-900 bg-gray-200 rounded-md dark:bg-gray-700 dark:text-white"
+                            aria-label={`انتخاب آیکون برای دسته‌بندی ${category.title}`}
                           >
                             <IconComponent className="w-5 h-5" />
                             انتخاب آیکون
@@ -260,6 +261,7 @@ const CategoriesSettings: React.FC = () => {
                           type="button"
                           onClick={() => addSubcategory(category.id)}
                           className="flex items-center gap-2 px-4 py-2 mb-2 text-white rounded-lg bg-primary-600 hover:bg-primary-700"
+                          aria-label={`افزودن زیرمجموعه به دسته‌بندی ${category.title}`}
                         >
                           <Plus className="w-5 h-5" />
                           افزودن زیرمجموعه
@@ -277,6 +279,7 @@ const CategoriesSettings: React.FC = () => {
                               type="button"
                               onClick={() => removeSubcategory(category.id, subIndex)}
                               className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-800"
+                              aria-label={`حذف زیرمجموعه ${subIndex + 1} از دسته‌بندی ${category.title}`}
                             >
                               <Trash2 className="w-5 h-5" />
                               حذف
@@ -289,6 +292,7 @@ const CategoriesSettings: React.FC = () => {
                       type="button"
                       onClick={() => removeCategory(category.id)}
                       className="flex items-center gap-2 px-4 py-2 mt-4 text-red-600 hover:text-red-800"
+                      aria-label={`حذف دسته‌بندی ${category.title}`}
                     >
                       <Trash2 className="w-5 h-5" />
                       حذف دسته‌بندی
@@ -303,6 +307,7 @@ const CategoriesSettings: React.FC = () => {
           <button
             type="submit"
             className="flex items-center gap-2 px-6 py-3 text-white rounded-lg bg-primary-600 hover:bg-primary-700"
+            aria-label="ذخیره تغییرات دسته‌بندی‌ها"
           >
             <Save className="w-5 h-5" />
             ذخیره تغییرات
@@ -321,6 +326,7 @@ const CategoriesSettings: React.FC = () => {
                 <button
                   onClick={closeAddModal}
                   className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                  aria-label="بستن مودال افزودن دسته‌بندی"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -358,6 +364,7 @@ const CategoriesSettings: React.FC = () => {
                       type="button"
                       onClick={() => setShowIconPicker(0)}
                       className="flex items-center gap-2 px-4 py-2 text-gray-900 bg-gray-200 rounded-md dark:bg-gray-700 dark:text-white"
+                      aria-label="انتخاب آیکون برای دسته‌بندی جدید"
                     >
                       {(() => {
                         const IconComponent = iconMap[newCategory.icon] || defaultIcon.Icon;
@@ -393,6 +400,7 @@ const CategoriesSettings: React.FC = () => {
                     type="button"
                     onClick={() => setNewCategory({ ...newCategory, subcategories: [...newCategory.subcategories, ''] })}
                     className="flex items-center gap-2 px-4 py-2 mb-2 text-white rounded-lg bg-primary-600 hover:bg-primary-700"
+                    aria-label="افزودن زیرمجموعه به دسته‌بندی جدید"
                   >
                     <Plus className="w-5 h-5" />
                     افزودن زیرمجموعه
@@ -417,6 +425,7 @@ const CategoriesSettings: React.FC = () => {
                           setNewCategory({ ...newCategory, subcategories: updatedSubcategories });
                         }}
                         className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-800"
+                        aria-label={`حذف زیرمجموعه ${subIndex + 1} از دسته‌بندی جدید`}
                       >
                         <Trash2 className="w-5 h-5" />
                         حذف
@@ -430,6 +439,7 @@ const CategoriesSettings: React.FC = () => {
                   type="button"
                   onClick={closeAddModal}
                   className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  aria-label="لغو افزودن دسته‌بندی جدید"
                 >
                   لغو
                 </button>
@@ -437,6 +447,7 @@ const CategoriesSettings: React.FC = () => {
                   type="button"
                   onClick={addCategoryFromModal}
                   className="px-4 py-2 text-white rounded-md bg-primary-600 hover:bg-primary-700"
+                  aria-label="تأیید افزودن دسته‌بندی جدید"
                 >
                   تأیید
                 </button>
@@ -454,6 +465,7 @@ const CategoriesSettings: React.FC = () => {
                 <button
                   onClick={() => setShowIconPicker(null)}
                   className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+                  aria-label="بستن مودال انتخاب آیکون"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -474,6 +486,7 @@ const CategoriesSettings: React.FC = () => {
                       key={name}
                       onClick={() => selectIcon(showIconPicker === 0 ? 0 : showIconPicker, name)}
                       className="flex flex-col items-center p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+                      aria-label={`انتخاب آیکون ${displayName}`}
                     >
                       <Icon className="w-6 h-6 text-gray-900 dark:text-white" />
                       <span className="mt-1 text-sm text-gray-900 dark:text-white">{displayName}</span>

@@ -252,53 +252,53 @@ const Dashboard = () => {
         <title>داشبورد مدیریت | کتاب‌خانه</title>
       </Helmet>
 
-      <div className="p-6">
-        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">داشبورد مدیریت</h1>
+      <div className="p-4 sm:p-6">
+        <h1 className="mb-6 text-xl font-bold text-gray-900 sm:text-2xl dark:text-white">داشبورد مدیریت</h1>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 mb-8 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (
             <div 
               key={index} 
-              className="p-6 transition-all duration-300 transform border border-gray-200 rounded-lg shadow-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 hover:scale-105"
+              className="p-4 transition-all duration-300 transform border border-gray-200 rounded-lg shadow-md sm:p-6 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 hover:scale-105"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">{stat.title}</p>
-                  <h3 className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</h3>
+                  <p className="text-xs text-gray-600 sm:text-sm dark:text-gray-300">{stat.title}</p>
+                  <h3 className="mt-1 text-lg font-bold text-gray-900 sm:text-2xl dark:text-white">{stat.value}</h3>
                 </div>
-                <stat.icon className="w-8 h-8 text-primary-700 dark:text-primary-300" />
+                <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-primary-700 dark:text-primary-300" />
               </div>
-              <div className="mt-4">
-                <span className={`text-sm ${stat.change.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              <div className="mt-2 sm:mt-4">
+                <span className={`text-xs sm:text-sm ${stat.change.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                   {stat.change}
                 </span>
-                <span className="text-sm text-gray-600 dark:text-gray-300"> نسبت به ماه قبل</span>
+                <span className="text-xs text-gray-600 sm:text-sm dark:text-gray-300"> نسبت به ماه قبل</span>
               </div>
             </div>
           ))}
         </div>
 
         {/* Top Books */}
-        <div className="p-6 mb-8 bg-white rounded-lg shadow dark:bg-gray-800">
-          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">محبوب‌ترین کتاب‌ها</h2>
+        <div className="p-4 mb-8 bg-white rounded-lg shadow sm:p-6 dark:bg-gray-800">
+          <h2 className="mb-4 text-lg font-bold text-gray-900 sm:text-xl dark:text-white">محبوب‌ترین کتاب‌ها</h2>
           <div className="overflow-x-auto">
             <table className="w-full font-sans border-collapse table-auto">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">نام کتاب</th>
-                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">نویسنده</th>
-                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">تعداد فروش</th>
-                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">قیمت</th>
+                  <th className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">نام کتاب</th>
+                  <th className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">نویسنده</th>
+                  <th className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">تعداد فروش</th>
+                  <th className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">قیمت</th>
                 </tr>
               </thead>
               <tbody>
                 {topBooks.map((book) => (
                   <tr key={book.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-4 py-3 text-right text-gray-900 truncate dark:text-white">{book.title}</td>
-                    <td className="px-4 py-3 text-right text-gray-900 truncate dark:text-white">{book.author}</td>
-                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{book.sales}</td>
-                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{book.price} تومان</td>
+                    <td className="px-2 py-2 text-xs text-right text-gray-900 truncate sm:px-4 sm:py-3 sm:text-sm dark:text-white">{book.title}</td>
+                    <td className="px-2 py-2 text-xs text-right text-gray-900 truncate sm:px-4 sm:py-3 sm:text-sm dark:text-white">{book.author}</td>
+                    <td className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">{book.sales}</td>
+                    <td className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">{book.price} تومان</td>
                   </tr>
                 ))}
               </tbody>
@@ -307,25 +307,25 @@ const Dashboard = () => {
         </div>
 
         {/* Active Users */}
-        <div className="p-6 mb-8 bg-white rounded-lg shadow dark:bg-gray-800">
-          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">کاربران فعال اخیر</h2>
+        <div className="p-4 mb-8 bg-white rounded-lg shadow sm:p-6 dark:bg-gray-800">
+          <h2 className="mb-4 text-lg font-bold text-gray-900 sm:text-xl dark:text-white">کاربران فعال اخیر</h2>
           <div className="overflow-x-auto">
             <table className="w-full font-sans border-collapse table-auto">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">نام کاربر</th>
-                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">ایمیل</th>
-                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">آخرین فعالیت</th>
-                  <th className="px-4 py-3 text-right text-gray-900 dark:text-white">تعداد سفارشات</th>
+                  <th className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">نام کاربر</th>
+                  <th className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">ایمیل</th>
+                  <th className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">آخرین فعالیت</th>
+                  <th className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">تعداد سفارشات</th>
                 </tr>
               </thead>
               <tbody>
                 {activeUsers.map((user) => (
                   <tr key={user.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-4 py-3 text-right text-gray-900 truncate dark:text-white">{user.name}</td>
-                    <td className="px-4 py-3 text-right text-gray-900 truncate dark:text-white">{user.email}</td>
-                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{user.lastActivity}</td>
-                    <td className="px-4 py-3 text-right text-gray-900 dark:text-white">{user.orders}</td>
+                    <td className="px-2 py-2 text-xs text-right text-gray-900 truncate sm:px-4 sm:py-3 sm:text-sm dark:text-white">{user.name}</td>
+                    <td className="px-2 py-2 text-xs text-right text-gray-900 truncate sm:px-4 sm:py-3 sm:text-sm dark:text-white">{user.email}</td>
+                    <td className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">{user.lastActivity}</td>
+                    <td className="px-2 py-2 text-xs text-right text-gray-900 sm:px-4 sm:py-3 sm:text-sm dark:text-white">{user.orders}</td>
                   </tr>
                 ))}
               </tbody>
@@ -334,14 +334,14 @@ const Dashboard = () => {
         </div>
 
         {/* Recent Orders */}
-        <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">سفارشات اخیر</h2>
+        <div className="p-4 bg-white rounded-lg shadow sm:p-6 dark:bg-gray-800">
+          <div className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-bold text-gray-900 sm:text-xl dark:text-white">سفارشات اخیر</h2>
             <div className="flex items-center gap-2">
-              <label htmlFor="status-filter" className="text-gray-900 dark:text-white">فیلتر وضعیت:</label>
+              <label htmlFor="status-filter" className="text-sm text-gray-900 dark:text-white sm:text-base">فیلتر وضعیت:</label>
               <select 
                 id="status-filter"
-                className="w-48 px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg sm:w-48 sm:text-base dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value);
@@ -357,7 +357,9 @@ const Dashboard = () => {
               </select>
             </div>
           </div>
-          <div className="overflow-x-auto">
+
+          {/* نمایش به صورت جدول در دسکتاپ و تبلت */}
+          <div className="hidden overflow-x-auto sm:block">
             <table className="w-full table-fixed font-sans border-collapse min-w-[800px]">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
@@ -436,28 +438,60 @@ const Dashboard = () => {
             </table>
           </div>
 
+          {/* نمایش به صورت کارت در موبایل */}
+          <div className="block space-y-4 sm:hidden">
+            {currentOrders.map((order) => (
+              <div key={order.id} className="p-4 border border-gray-200 rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900 dark:text-white">شماره سفارش:</span>
+                    <span className="text-gray-900 dark:text-white">{order.id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900 dark:text-white">مشتری:</span>
+                    <span className="text-gray-900 truncate dark:text-white">{order.customer}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900 dark:text-white">تاریخ:</span>
+                    <span className="text-gray-900 dark:text-white">{order.date}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900 dark:text-white">وضعیت:</span>
+                    <span className={`${getStatusBadgeClass(order.status)} px-2 py-1 rounded-full text-sm`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900 dark:text-white">مبلغ:</span>
+                    <span className="text-gray-900 dark:text-white">{order.amount} تومان</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Pagination */}
-          <div className="flex flex-col items-center justify-between p-4 mt-4 bg-white rounded-lg shadow sm:flex-row dark:bg-gray-800">
-            <div className="flex flex-col items-center gap-4 mb-4 sm:flex-row sm:mb-0">
+          <div className="flex flex-col items-center justify-between gap-4 p-4 mt-4 bg-white rounded-lg shadow dark:bg-gray-800">
+            <div className="flex flex-col items-center w-full gap-4 sm:flex-row">
               <div className="flex items-center gap-2">
-                <label htmlFor="items-per-page" className="text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
+                <label htmlFor="items-per-page" className="text-sm text-gray-900 dark:text-white">تعداد در هر صفحه:</label>
                 <select
                   id="items-per-page"
                   value={itemsPerPage}
                   onChange={handleItemsPerPageChange}
-                  className="px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="px-2 py-1 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
                   <option value={20}>20</option>
                 </select>
               </div>
-              <span className="text-gray-900 dark:text-white">
+              <span className="text-sm text-gray-900 dark:text-white">
                 نمایش {startIndex + 1}-{endIndex} از {sortedOrders.length} سفارش
               </span>
             </div>
 
-            <div className="flex flex-col items-center gap-4 sm:flex-row">
+            <div className="flex flex-col items-center w-full gap-4 sm:flex-row">
               <div className="flex items-center gap-2">
                 <button
                   onClick={goToPreviousPage}
@@ -469,14 +503,14 @@ const Dashboard = () => {
                       : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <div className="flex gap-1">
                   {getPageNumbers().map((page, index) => (
                     <button
                       key={index}
                       onClick={() => typeof page === 'number' && goToPage(page)}
-                      className={`px-3 py-1 rounded-lg transition-colors ${
+                      className={`px-2 sm:px-3 py-1 rounded-lg transition-colors text-sm sm:text-base ${
                         page === currentPage
                           ? 'bg-primary-600 text-white'
                           : typeof page === 'number'
@@ -499,7 +533,7 @@ const Dashboard = () => {
                       : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -508,7 +542,7 @@ const Dashboard = () => {
                   value={goToPageInput}
                   onChange={(e) => setGoToPageInput(e.target.value)}
                   placeholder="شماره صفحه"
-                  className="w-24 px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-20 px-2 py-1 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg sm:w-24 sm:px-3 sm:py-2 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   min="1"
                   max={totalPages}
                 />
@@ -516,7 +550,7 @@ const Dashboard = () => {
                   onClick={handleGoToPage}
                   aria-label="برو به صفحه مورد نظر"
                   title="برو به صفحه مورد نظر"
-                  className="px-3 py-2 text-white transition-colors rounded-lg bg-primary-600 hover:bg-primary-700"
+                  className="px-2 py-1 text-sm text-white transition-colors rounded-lg sm:px-3 sm:py-2 sm:text-base bg-primary-600 hover:bg-primary-700"
                 >
                   برو
                 </button>
@@ -526,15 +560,15 @@ const Dashboard = () => {
         </div>
 
         {showScrollToTop && (
-  <button
-    onClick={scrollToTop}
-    aria-label="برو به بالای صفحه"
-    title="برو به بالای صفحه"
-    className="fixed p-3 text-white transition-colors rounded-full shadow-lg bottom-6 left-6 bg-primary-600 hover:bg-primary-700"
-  >
-    <ArrowUp className="w-6 h-6" />
-  </button>
-)}
+          <button
+            onClick={scrollToTop}
+            aria-label="برو به بالای صفحه"
+            title="برو به بالای صفحه"
+            className="fixed p-2 text-white transition-colors rounded-full shadow-lg sm:p-3 bottom-4 sm:bottom-6 left-4 sm:left-6 bg-primary-600 hover:bg-primary-700"
+          >
+            <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        )}
       </div>
     </>
   );

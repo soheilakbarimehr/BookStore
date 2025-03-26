@@ -8,7 +8,7 @@ import { useCart } from '../context/CartContext';
 import { useBooksContent } from '../context/BooksContentContext';
 
 const BookDetails: React.FC = () => {
-  const { books } = useBooksContent(); // استفاده از Context به جای پراپس
+  const { books } = useBooksContent();
   const { id } = useParams<{ id: string }>();
   const { addToCart } = useCart();
 
@@ -89,7 +89,7 @@ const BookDetails: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                 {book.price.toLocaleString('fa-IR')} تومان
               </span>
@@ -97,10 +97,10 @@ const BookDetails: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => addToCart({ ...book, quantity: 1 })}
-                className="flex items-center justify-center gap-2 px-6 py-3 text-white transition-colors rounded-md bg-primary-600 hover:bg-primary-700"
+                className="flex items-center justify-center w-full gap-2 px-4 py-2 text-sm text-white transition-colors rounded-md sm:text-base sm:px-6 sm:py-3 bg-primary-600 hover:bg-primary-700 sm:w-auto"
                 aria-label={`افزودن ${book.title} به سبد خرید`}
               >
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                 افزودن به سبد خرید
               </motion.button>
             </div>
@@ -117,7 +117,7 @@ const BookDetails: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   whileHover={{ scale: 1.02, boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}
-                  className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden relative min-h-[400px]"
+                  className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden min-h-[400px] flex flex-col"
                 >
                   <Link to={`/books/${similarBook.id}`} aria-label={`مشاهده کتاب ${similarBook.title}`}>
                     <div className="relative">
@@ -142,7 +142,7 @@ const BookDetails: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <div className="p-4 flex flex-col h-[200px]">
+                    <div className="flex flex-col flex-1 p-4">
                       <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
                         {similarBook.title}
                       </h3>
@@ -165,10 +165,10 @@ const BookDetails: React.FC = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => addToCart({ ...similarBook, quantity: 1 })}
-                    className="absolute flex items-center justify-center gap-2 py-2 text-white transition-colors rounded-md bottom-4 left-4 right-4 bg-primary-600 hover:bg-primary-700"
+                    className="flex items-center justify-center gap-2 px-4 py-2 mx-4 mb-4 text-sm text-white transition-colors rounded-md sm:text-base bg-primary-600 hover:bg-primary-700"
                     aria-label={`افزودن ${similarBook.title} به سبد خرید`}
                   >
-                    <ShoppingCart className="w-5 h-5" />
+                    <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                     افزودن به سبد خرید
                   </motion.button>
                 </motion.div>
