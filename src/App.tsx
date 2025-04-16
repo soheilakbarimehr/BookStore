@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { HomeContentProvider } from './context/HomeContentContext';
@@ -31,6 +31,7 @@ import HomeSettings from './pages/admin/HomeSettings';
 import AboutSettings from './pages/admin/AboutSettings';
 
 function App() {
+
   return (
     <CartProvider>
       <HomeContentProvider>
